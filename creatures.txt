@@ -1,0 +1,1 @@
+[{id:1, parent1_id:0, parent2_id:0}, {id:2, parent1_id:0, parent2_id:0}, {id:3, parent1_id:1, parent2_id:2}, {id:4, parent1_id:3, parent2_id:3}, {id:5, parent1_id:3, parent2_id:4}, {id:6, parent1_id:2, parent2_id:1}, {id:7, parent1_id:5, parent2_id:2}, {id:8, parent1_id:2, parent2_id:5}, {id:9, parent1_id:2, parent2_id:4}, {id:10, parent1_id:5, parent2_id:2}]
