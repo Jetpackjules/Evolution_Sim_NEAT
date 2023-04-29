@@ -5,7 +5,7 @@ const TOGGLE_KEY = KEY_T
 
 # Sample creatures array
 
-#onready var Main_Overseer = preload("res://demos/cars/CarMain.tscn")
+#onready var Main_Overseer = preload("res://demos/boogers/CarMain.tscn")
 
 # Family tree nodes
 var tree_nodes = {}

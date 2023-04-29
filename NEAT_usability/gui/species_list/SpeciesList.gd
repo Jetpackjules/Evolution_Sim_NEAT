@@ -79,7 +79,7 @@ func update_species_list() -> void:
 
 
 	#PRINTING DEBUG SHIT:
-	print_tree_pretty()
+#	print_tree_pretty()
 #	print_tree()
 #	print_stray_nodes()
 

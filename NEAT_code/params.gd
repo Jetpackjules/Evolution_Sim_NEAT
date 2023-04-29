@@ -25,7 +25,7 @@ var default_visibility = 0
 
 # ----- new_generation method
 # Number of genomes agents existing at the same time (= one generation)
-var population_size = 300
+var population_size = 100
 # turn on/off printing info about past generation, when making a new generation
 var print_new_generation = true
 
@@ -44,7 +44,7 @@ var print_new_generation = true
 var num_initial_links = 4
 
 # maximum amount of neurons, for performance reasons. can be set arbitrarily
-var max_neuron_amt = 100
+var max_neuron_amt = 150
 
 # ----- Chaining
 # if prevent_chaining is true, only split links that connect to neurons having

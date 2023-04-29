@@ -278,11 +278,14 @@ func next_generation() -> void:
 
 			# Choose one of the parents' positions randomly
 			var parent_position
-			if (parent1.body) and (parent2.body):
+			if (str(parent1.body) != "[Deleted Object]") and (str(parent2.body) != "[Deleted Object]"):
+				var test = str(parent2.body)
+				if not "Booger" in test:
+					print(test)
 				parent_position = parent1.body.position if Utils.random_f() < 0.5 else parent2.body.position				
-			elif parent1.body:
+			elif str(parent1.body) != "[Deleted Object]":
 				parent_position = parent1.body.position
-			elif parent2.body:
+			elif str(parent2.body) != "[Deleted Object]":
 				parent_position = parent2.body.position
 			else:
 #				print("FAILED TO FIND PARENT!")
@@ -392,7 +395,7 @@ func finish_current_agents() -> void:
 		# if the generation is terminated before all agents are dead
 		if not agent.is_dead:
 			agent.fitness = agent.body.get_fitness()
-			agent.body.food_score = 0
+			agent.body.food_score *= 0.3
 #			agent.fitness
 			agent.body.hunger_multiplier += 0.5
 			alive.append(agent)
@@ -539,7 +542,7 @@ func print_status() -> void:
 	var print_vars = {"gen_id" : curr_generation, "new_s" : num_new_species,
 					  "dead_s" : num_dead_species, "tot_s" : curr_species.size(),
 					  "avg_fit" : avg_population_fitness, "best" : curr_best.fitness}
-#	print(print_str.format(print_vars))
+	print(print_str.format(print_vars))
 	
 	
 #	print("NODE TREE: -----------------")

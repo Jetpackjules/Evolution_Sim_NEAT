@@ -24,9 +24,9 @@ func _ready() -> void:
 func load_car_scene() -> void:
 	"""Copy car params to user://param_configs/ and switch to car menu scene.
 	"""
-	dir.copy("res://demos/cars/car_params.cfg",
+	dir.copy("res://demos/boogers/car_params.cfg",
 			 "user://param_configs/car_params.cfg")
-	get_tree().change_scene("res://demos/cars/splash_screen/CarSplash.tscn")
+	get_tree().change_scene("res://demos/boogers/splash_screen/CarSplash.tscn")
 
 
 func load_lander_scene() -> void:
