@@ -348,7 +348,19 @@ func make_new_species(founding_member: Genome) -> Species:
 	representative, and adds the new species to curr_species and returns it.
 	"""
 	var new_species_id = str(curr_generation) + "_" + str(founding_member.id)
-	var new_species = Species.new(new_species_id)
+
+	var color = null
+	for species in curr_species:
+		if species.species_id == founding_member.species_id:
+			color = species.color
+			
+	var new_species
+	if color:
+		new_species = Species.new(new_species_id, color)
+	else:
+		new_species = Species.new(new_species_id)
+		
+		
 	new_species.representative = founding_member
 	curr_species.append(new_species)
 	num_new_species += 1
@@ -394,7 +406,7 @@ func finish_current_agents() -> void:
 			agent.fitness = agent.body.get_fitness()
 			agent.body.food_score = 0
 #			agent.fitness
-			agent.body.hunger_multiplier += 0.5
+			agent.body.energy_consumption_multiplier += 0.5
 			alive.append(agent)
 			genome.fitness = agent.fitness
 		else:

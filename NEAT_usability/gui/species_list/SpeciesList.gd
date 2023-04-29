@@ -70,18 +70,6 @@ func update_species_list() -> void:
 	var info_text = default_pop_info % [ga.curr_agents.size(),
 										ga.curr_species.size(),
 										ga.best_species.species_id]
-#	checking to see if any dead people slip by:
-#	var dead = 0
-#	for thing in ga.alive:
-#		if thing.is_dead:
-#			dead += 1
-#	print("LIVING: ", ga.alive.size()-dead, "/", ga.alive.size())
-
-
-	#PRINTING DEBUG SHIT:
-	print_tree_pretty()
-#	print_tree()
-#	print_stray_nodes()
 
 
 	population_info.parse_bbcode(info_text)

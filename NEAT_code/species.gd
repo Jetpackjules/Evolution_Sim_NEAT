@@ -50,11 +50,16 @@ var num_gens_no_improvement = 0
 
 var color = Color(0.0, 0.0, 0.0, 1.0)
 
-func _init(id: String) -> void:
+func _init(id: String, original_color: Color = Color(randf(), randf(), randf(), 1.0)) -> void:
 	"""Creates a new species
 	"""
 	species_id = id
-	color = Color(randf(), randf(), randf(), 1.0)
+	var difference = 0.25
+	color = Color(clamp(original_color.r + rand_range(-difference, difference), 0, 1),
+		 clamp(original_color.g + rand_range(-difference, difference), 0, 1),
+		 clamp(original_color.b + rand_range(-difference, difference), 0, 1), 1.0)
+
+
 
 func new_leader():
 	alive_members.sort_custom(self, "sort_by_fitness")

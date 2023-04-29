@@ -7,13 +7,13 @@ export (int) var max_attempts = 10
 
 export (float) var time_interval = 10
 export (float) var bush_spawn = 1
-export (float) var area_spawn = 6
+export (float) var area_spawn = 11
 
 var rng = RandomNumberGenerator.new()
 
 func _ready():
 	rng.seed = 42
-	bush_grow(20, spawn_range)
+#	bush_grow(20, spawn_range)
 	renew(200, 3000)
 
 var time_passed = 0
@@ -21,7 +21,7 @@ func _physics_process(delta) -> void:
 	time_passed += delta
 	if time_passed > 1:
 		renew(area_spawn, 3000)
-		bush_grow(bush_spawn, spawn_range)
+#		bush_grow(bush_spawn, spawn_range)
 		time_passed = 0
 
 

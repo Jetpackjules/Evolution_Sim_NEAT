@@ -10,11 +10,10 @@ func _ready() -> void:
 func touched(body) -> void:
 	if "Food" in name:
 		body.food_score += 0.5
-		body.hunger -= 1
+		body.energy += 1
 		
 		var sprite = body.get_node("Sprite")
-		var hunger = (-body.hunger)+body.starvation_threshold
-		var new_size = max(hunger*(0.058125/5), 0.093)
+		var new_size = max(body.energy*(0.058125/5), 0.093)
 		if sprite:
 			sprite.scale = Vector2(new_size, new_size)
 			

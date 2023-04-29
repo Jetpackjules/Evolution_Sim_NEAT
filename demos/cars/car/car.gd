@@ -10,20 +10,11 @@ high acceleration. All steering happens during the act() method.
 """
 
 # Driving Properties
-var hunger_multiplier = 0
+var energy_consumption_multiplier = 1
 var acceleration = 15
 var max_forward_velocity = 1000
-var drag_coefficient = 0.99 # Recommended: 0.99 - Affects how fast you slow down
-var steering_torque = 30 # Affects turning speed
-var steering_damp = 7 # 7 - Affects how fast the torque slows down
+var steering_torque = 5 # Affects turning speed
 
-# Drifting & Tire Friction
-var can_drift = false
-var wheel_grip_sticky = 0.85 # Default drift coef (will stick to road, most of the time)
-var wheel_grip_slippery = 0.99 # Affects how much you "slide"
-var drift_extremum = 250 # Right velocity higher than this will cause you to slide
-var drift_asymptote = 20 # During a slide you need to reduce right velocity to this to gain control
-var _drift_factor = wheel_grip_sticky # Determines how much (or little) your vehicle drifts
 
 # Vehicle velocity and angular velocity. Override rigidbody velocity in physics process
 var _velocity = Vector2()
@@ -40,9 +31,9 @@ var num_casts = 8
 var food_score = 0.0
 var life_score = 0.0
 
-var hunger = 0.0
+var energy = 0.0
 
-var starvation_threshold = 5.0/3.0 # Set your desired threshold here (in secondsk)
+#var starvation_threshold = 5.0/3.0 # Set your desired threshold here (in secondsk)
 
 var dead = false
 
@@ -64,9 +55,9 @@ func _ready() -> void:
 	# Top Down Physics
 	set_gravity_scale(0.0)
 	food_score = 0.0
-	hunger = 0.0
+	energy = 1.6
 	life_score = 0.0
-	hunger_multiplier = 1.0
+	energy_consumption_multiplier = 1.0
 	# Generate specified number of raycasts 
 	var cast_angle = 0
 	var cast_arc = TAU / num_casts
@@ -88,19 +79,12 @@ func _ready() -> void:
 func _physics_process(_delta) -> void:
 	"""This script overrides the behavior of a rigidbody (Not my idea, but it works).
 	"""
-	# Show hunger:
-	$Sprite/Label.text = str(stepify(-hunger+starvation_threshold, 0.1))
-#	showing position instead:
-#	$Sprite/Label.text = str(global_position)
-#	$Sprite/Label2.text = str(position)
+	# Show energy:
+	$Sprite/Label.text = str(stepify(energy, 0.1))
 
 
-
-	#-------------------	
-#	_velocity *= drag_coefficient
-	
 	# Add drift to velocity
-	_velocity = get_up_velocity() + (get_right_velocity() * _drift_factor)
+	_velocity = get_up_velocity() + (get_right_velocity())
 
 	# Override Rigidbody movement
 	set_linear_velocity(_velocity)
@@ -110,7 +94,7 @@ func _physics_process(_delta) -> void:
 	# Update the forward speed
 	speed = -get_up_velocity().dot(transform.y)
 	
-	hunger += (_delta/6.0)*hunger_multiplier
+	energy -= (_delta/6.0)*energy_consumption_multiplier
 	starve()
 	life_score += _delta
 	
@@ -152,16 +136,15 @@ func sense() -> Array:
 	var rel_speed = range_lerp(speed, -max_forward_velocity, max_forward_velocity, 0, 2)
 	# Append relative speed, angular_velocity and _drift_factor to the cars senses
 	senses.append(rel_speed)
-	senses.append(-hunger+starvation_threshold)
+	senses.append(energy)
 	return senses
 
 
 func act(actions: Array) -> void:
-	"""Use the networks output to control the cars steering.
+	"""Use the networks output to control the creature's movement.
 	"""
-	# Torque depends that the vehicle is moving
-	var torque = lerp(0, steering_torque, _velocity.length() / max_forward_velocity)
-#	var torque = 1
+	var torque = steering_torque
+
 	# accelerate
 	if actions[0] > 0.3:
 		_velocity = -transform.y * acceleration * 15
@@ -169,21 +152,23 @@ func act(actions: Array) -> void:
 	elif actions[1] > 0.3:
 		_velocity = transform.y * acceleration * 15
 	else:
-		_velocity = transform.y * 0
+		_velocity = Vector2(0, 0)
 
 	# steer right
 	if actions[2] > 0.2:
-		_angular_velocity = range_lerp(actions[2], 0.2, 1, 0, 1) * torque * sign(speed)
+		_angular_velocity = range_lerp(actions[2], 0.2, 1, 0, 1) * torque
 	# steer left
 	elif actions[3] > 0.2:
-		_angular_velocity = range_lerp(actions[3], 0.2, 1, 0, 1) * -torque * sign(speed)
+		_angular_velocity = range_lerp(actions[3], 0.2, 1, 0, 1) * -torque
 	else:
 		_angular_velocity = 0
+
 	# Prevent exceeding max velocity
 	var max_speed = (Vector2(0, -1) * max_forward_velocity).rotated(rotation)
 	var x = clamp(_velocity.x, -abs(max_speed.x), abs(max_speed.x))
 	var y = clamp(_velocity.y, -abs(max_speed.y), abs(max_speed.y))
 	_velocity = Vector2(x, y)
+
 
 
 func get_fitness() -> float:
@@ -209,7 +194,7 @@ func crash(body) -> void:
 
 
 func starve() -> void:
-	if hunger > starvation_threshold:
+	if energy < 0:
 #		print("STARVED")
 		# trigger the crash effect
 		$Explosion.show(); $Explosion.play()
@@ -220,12 +205,6 @@ func starve() -> void:
 func _on_Explosion_animation_finished() -> void:
 	$Explosion.stop(); hide()
 
-#hiding labels:
-#func _unhandled_input(event):
-#	if event is InputEventMouseButton and event.button_index == BUTTON_LEFT and event.pressed:
-#
-##		get_tree().paused = !get_tree().paused
-#	pass
 
 func _input(event):
 	if event is InputEventKey:
