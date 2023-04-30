@@ -288,6 +288,11 @@ func next_generation() -> void:
 #				print("FAILED TO FIND PARENT!")
 				print(type)
 				parent_position = Vector2(-2000,-2000)
+				
+#			adding stagger margin:
+			var margin = 100
+			parent_position += Vector2(rand_range(-margin, margin), rand_range(-margin, margin))
+
 #				print(type)
 			# Update the generate_agent() call
 			curr_agents.append(baby.generate_agent(parent_position))
@@ -404,7 +409,7 @@ func finish_current_agents() -> void:
 		# if the generation is terminated before all agents are dead
 		if not agent.is_dead:
 			agent.fitness = agent.body.get_fitness()
-			agent.body.food_score = 0
+#			agent.body.food_score = 0
 #			agent.fitness
 			agent.body.energy_consumption_multiplier += 0.5
 			alive.append(agent)
@@ -551,11 +556,11 @@ func print_status() -> void:
 	var print_vars = {"gen_id" : curr_generation, "new_s" : num_new_species,
 					  "dead_s" : num_dead_species, "tot_s" : curr_species.size(),
 					  "avg_fit" : avg_population_fitness, "best" : curr_best.fitness}
-#	print(print_str.format(print_vars))
+	print(print_str.format(print_vars))
 	
 	
 #	print("NODE TREE: -----------------")
-	_print_node_tree_recursive(get_tree().get_root().get_node("CarMain/Track/Start"), 0)
+#	_print_node_tree_recursive(get_tree().get_root().get_node("CarMain/Track/Start"), 0)
 #	_print_node_tree_recursive(get_tree().get_root().get_node("CarMain/Track/Start"), 1)
 #	print("DONE")
 	

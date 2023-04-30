@@ -15,9 +15,11 @@ var time = 0
 # total_time gets reset every time a new generation is started
 var total_time = 0
 # every time_step the cars network takes sensory information and decides how to act
-var time_step = 0.2
+var time_step = 0.1
+#USED TO BE 0.2!!
+
 # every generation_step a new generation is made. this gets increased over time.
-var generation_step = 15
+var generation_step = 10
 
 # path to the car scene that will be controlled by the AI
 var agent_body_path = "res://demos/cars/car/Car.tscn"
@@ -29,7 +31,7 @@ onready var tree = preload("res://NEAT_usability/gui/graph/tree.tscn")
 
 
 #old config: car_params
-var ga = GeneticAlgorithm.new(18, 4, agent_body_path, true, "Custom_Evolution_Config")
+var ga = GeneticAlgorithm.new(18, 5, agent_body_path, true, "Custom_Evolution_Config")
 
 # chosen track. Tracks are numbered, however the car_splash refers to them by difficulty
 var curr_track_num: int
@@ -96,7 +98,7 @@ func _physics_process(delta) -> void:
 			place_bodies(ga.get_curr_bodies())
 			# every x gens, increase the generation_step
 			if ga.curr_generation % 2 == 0:
-				generation_step = min(generation_step + 2, 30)
+				generation_step = min(generation_step + 2, 65)
 				print("increased step to " + str(generation_step))
 			total_time = 0
 
@@ -174,6 +176,3 @@ func _unhandled_input(event):
 			print("GENOMES: ", len(ga.all_genomes))
 			$Track/FamilyTree.cycle(ga.all_genomes)
 			pass
-
-
-

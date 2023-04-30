@@ -2,12 +2,12 @@ extends Node2D
 
 var Food = load("res://demos/cars/tracks/track_4/Food.tscn")
 
-export (int) var spawn_range = 100
+export (int) var spawn_range = 250
 export (int) var max_attempts = 10
 
 export (float) var time_interval = 10
-export (float) var bush_spawn = 1
-export (float) var area_spawn = 11
+export (float) var bush_spawn = 0
+export (float) var area_spawn = 15
 
 var rng = RandomNumberGenerator.new()
 
@@ -21,7 +21,7 @@ func _physics_process(delta) -> void:
 	time_passed += delta
 	if time_passed > 1:
 		renew(area_spawn, 3000)
-#		bush_grow(bush_spawn, spawn_range)
+		bush_grow(bush_spawn, spawn_range)
 		time_passed = 0
 
 

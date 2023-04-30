@@ -43,6 +43,10 @@ onready var start = get_node("../../Start")
 # signal that let's the controlling agent know it just died
 signal death
 
+
+
+onready var flash_timer = Timer.new()
+
 func _ready() -> void:
 	"""Connect the car to the bounds of the track, receive a signal when (any) car
 	collides with the bounds. Generate raycasts to measure the distance to the bounds.
@@ -55,7 +59,7 @@ func _ready() -> void:
 	# Top Down Physics
 	set_gravity_scale(0.0)
 	food_score = 0.0
-	energy = 1.6
+	energy = 2.5
 	life_score = 0.0
 	energy_consumption_multiplier = 1.0
 	# Generate specified number of raycasts 
@@ -67,14 +71,18 @@ func _ready() -> void:
 		caster.enabled = false
 		caster.cast_to = cast_point
 		caster.collide_with_areas = true
-		caster.collide_with_bodies = false
+		caster.collide_with_bodies = true
 		add_child(caster)
 		raycasters.append(caster)
 		cast_angle += cast_arc
 	# Added steering_damp since it may not be obvious at first glance that
 	# you can simply change angular_damp to get the same effect
 #	set_angular_damp(steering_damp)
-
+	# Add the flash timer as a child and connect its timeout signal
+	add_child(flash_timer)
+	flash_timer.connect("timeout", self, "_on_flash_timer_timeout")
+	
+	
 
 func _physics_process(_delta) -> void:
 	"""This script overrides the behavior of a rigidbody (Not my idea, but it works).
@@ -128,6 +136,8 @@ func sense() -> Array:
 				senses.append(1)  # 1 represents food
 			elif collided_object.is_in_group("danger"):
 				senses.append(-1)  # -1 represents danger
+			elif collided_object.is_in_group("booger") and collided_object != self:
+				senses.append(2)  # 2 represents other boogers (potential prey)
 			else:
 				senses.append(0)  # 0 for other objects
 		else:
@@ -163,20 +173,68 @@ func act(actions: Array) -> void:
 	else:
 		_angular_velocity = 0
 
+	# eat other boogers
+	if actions[4] > 0.5:
+		energy -= 0.2
+		var prey = get_preys_in_range(60)  # Adjust range to suit your needs
+		if prey:
+#			print("EATEN!")
+			eat(prey)
+
 	# Prevent exceeding max velocity
 	var max_speed = (Vector2(0, -1) * max_forward_velocity).rotated(rotation)
 	var x = clamp(_velocity.x, -abs(max_speed.x), abs(max_speed.x))
 	var y = clamp(_velocity.y, -abs(max_speed.y), abs(max_speed.y))
 	_velocity = Vector2(x, y)
 
+func get_preys_in_range(area: float) -> Node:
+	var prey = null
+	var min_distance = area
+	for booger in get_tree().get_nodes_in_group("booger"):
+		if booger != self:
+			var distance = global_position.distance_to(booger.global_position)
+			if distance < min_distance:
+				min_distance = distance
+				prey = booger
+	return prey
 
 
 func get_fitness() -> float:
 	life_score = life_score/10
 	return food_score + life_score
 
+func eat(prey):
+	get_node("Sprite").scale = Vector2(0.3, 0.3)
+	get_node("Sprite").texture = load("res://demos/cars/car/Cannibal_Booger.png")
+	energy += prey.energy * 0.5  # Predator gains 50% of prey's energy
+	prey.die()
+
+	# Make the sprite flash red
+	flash_red_sprite()
+	
+
+func flash_red_sprite() -> void:
+	get_node("Sprite").modulate = Color(1, 0, 0)  # Change the sprite color to red
+	flash_timer.start()  # Start the timer to revert the color after half a second
+
+func _on_flash_timer_timeout() -> void:
+	get_node("Sprite").modulate = Color(1, 1, 1)  # Revert the sprite color back to normal
 
 # ---------- CRASHING
+
+func die() -> void:
+	if is_in_group("booger"):
+		remove_from_group("booger")
+		set_linear_velocity(Vector2(0,0))
+		set_physics_process(false)
+		$Explosion.show(); $Explosion.play()
+		$Sprite.hide()
+		dead = true
+		emit_signal("death")
+	
+
+
+
 
 func crash(body) -> void:
 	"""Check if the body that collided with the bounds is self. If so, show an explosion
@@ -186,22 +244,15 @@ func crash(body) -> void:
 	it's own collider.
 	"""
 	if body == self:
-		$Explosion.show(); $Explosion.play()
-		$Sprite.hide()
 		food_score = food_score*0.5
-		dead = true
-		emit_signal("death")
+		die()
 
 
 func starve() -> void:
 	if energy < 0:
-#		print("STARVED")
-		# trigger the crash effect
-		$Explosion.show(); $Explosion.play()
-		$Sprite.hide()
-		dead = true
-		emit_signal("death")
-		
+		die()
+
+
 func _on_Explosion_animation_finished() -> void:
 	$Explosion.stop(); hide()
 

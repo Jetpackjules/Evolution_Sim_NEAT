@@ -87,7 +87,7 @@ animations = [ {
 "speed": 10.0
 } ]
 
-[node name="Car" type="RigidBody2D"]
+[node name="Car" type="RigidBody2D" groups=["booger"]]
 rotation = 1.5708
 collision_mask = 0
 script = ExtResource( 2 )
@@ -118,5 +118,9 @@ frames = SubResource( 14 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2( 0.5, 0.5 )
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
 
 [connection signal="animation_finished" from="Explosion" to="." method="_on_Explosion_animation_finished"]
