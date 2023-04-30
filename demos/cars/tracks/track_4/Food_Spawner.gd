@@ -7,7 +7,7 @@ export (int) var max_attempts = 10
 
 export (float) var time_interval = 10
 export (float) var bush_spawn = 0
-export (float) var area_spawn = 15
+export (float) var area_spawn = 10
 
 var rng = RandomNumberGenerator.new()
 

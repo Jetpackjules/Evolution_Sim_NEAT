@@ -37,13 +37,14 @@ var energy = 0.0
 
 var dead = false
 
+
 onready var center = get_node("../../Center")
 onready var start = get_node("../../Start")
 
 # signal that let's the controlling agent know it just died
 signal death
 
-
+var OG_COLOR
 
 onready var flash_timer = Timer.new()
 
@@ -55,7 +56,6 @@ func _ready() -> void:
 
 	# connect a signal from track bounds, to detect when a crash occurs
 	get_node("../../Bounds").connect("body_entered", self, "crash")
-	
 	# Top Down Physics
 	set_gravity_scale(0.0)
 	food_score = 0.0
@@ -214,11 +214,12 @@ func eat(prey):
 	
 
 func flash_red_sprite() -> void:
+	OG_COLOR = get_node("Sprite").modulate
 	get_node("Sprite").modulate = Color(1, 0, 0)  # Change the sprite color to red
 	flash_timer.start()  # Start the timer to revert the color after half a second
 
 func _on_flash_timer_timeout() -> void:
-	get_node("Sprite").modulate = Color(1, 1, 1)  # Revert the sprite color back to normal
+	get_node("Sprite").modulate = OG_COLOR  # Revert the sprite color back to normal
 
 # ---------- CRASHING
 
