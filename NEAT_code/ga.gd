@@ -120,7 +120,7 @@ func create_initial_population() -> Array:
 	var all_neurons = Utils.merge_dicts(input_neurons, output_neurons)
 	# --- generate the first generation of genomes
 	
-	var spawn_points = call_get_safe_spawn_points(300, 3000)
+	var spawn_points = call_get_safe_spawn_points(Params.population_size, 3000)
 	
 	var initial_genomes = []
 	for _initial_genome in Params.population_size:
@@ -290,7 +290,7 @@ func next_generation() -> void:
 				parent_position = Vector2(-2000,-2000)
 				
 #			adding stagger margin:
-			var margin = 100
+			var margin = 300
 			parent_position += Vector2(rand_range(-margin, margin), rand_range(-margin, margin))
 
 #				print(type)

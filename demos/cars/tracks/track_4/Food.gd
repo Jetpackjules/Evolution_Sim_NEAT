@@ -12,10 +12,10 @@ func touched(body) -> void:
 		body.food_score += 0.5
 		body.energy += 1
 		
-		var sprite = body.get_node("Sprite")
-		var new_size = max(body.energy*(0.058125/5), 0.093)
-		if sprite:
-			sprite.scale = Vector2(new_size, new_size)
+#		var sprite = body.get_node("Sprite")
+#		var new_size = max(body.energy*(0.058125/5), 0.093)
+#		if sprite:
+#			sprite.scale = Vector2(new_size, new_size)
 			
 	queue_free()
 

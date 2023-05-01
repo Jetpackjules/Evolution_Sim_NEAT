@@ -4,6 +4,7 @@ extends Node2D
 """The highlighter is a simple node 2d that draws a circle around it's parent
 object (the agent body).
 """
+var highlighter_radius = Params.highlighter_radius
 
 func _ready() -> void:
 	# set the name
@@ -17,9 +18,9 @@ func _draw():
 	"""Draw a circle around the parent node.
 	"""
 	draw_arc(Params.highlighter_offset,
-			 Params.highlighter_radius,
+			 highlighter_radius,
 			 0,
 			 TAU,
-			 Params.highlighter_radius / 2,
+			 highlighter_radius / 2,
 			 Params.highlighter_color,
 			 Params.highlighter_width)

@@ -12,7 +12,7 @@ high acceleration. All steering happens during the act() method.
 # Driving Properties
 var energy_consumption_multiplier = 1
 var acceleration = 15
-var max_forward_velocity = 1000
+var max_forward_velocity = 1500
 var steering_torque = 5 # Affects turning speed
 
 
@@ -26,7 +26,7 @@ var speed: int
 # hold a specified num of raycasts in an array to sense the environment
 var raycasters = []
 var sight_range = 350
-var num_casts = 8
+var num_casts = 16
 
 var food_score = 0.0
 var life_score = 0.0
@@ -37,23 +37,21 @@ var energy = 0.0
 
 var dead = false
 
+var eat_radius = 50
 
-onready var center = get_node("../../Center")
-onready var start = get_node("../../Start")
 
+#onready var center = get_node("../../Center")
+#onready var start = get_node("../../Start")
+onready var flash_timer = get_node("Timer")
 # signal that let's the controlling agent know it just died
 signal death
 
-var OG_COLOR
-
-onready var flash_timer = Timer.new()
 
 func _ready() -> void:
 	"""Connect the car to the bounds of the track, receive a signal when (any) car
 	collides with the bounds. Generate raycasts to measure the distance to the bounds.
 	"""
-	
-
+	get_child(5).highlighter_radius = eat_radius
 	# connect a signal from track bounds, to detect when a crash occurs
 	get_node("../../Bounds").connect("body_entered", self, "crash")
 	# Top Down Physics
@@ -75,11 +73,6 @@ func _ready() -> void:
 		add_child(caster)
 		raycasters.append(caster)
 		cast_angle += cast_arc
-	# Added steering_damp since it may not be obvious at first glance that
-	# you can simply change angular_damp to get the same effect
-#	set_angular_damp(steering_damp)
-	# Add the flash timer as a child and connect its timeout signal
-	add_child(flash_timer)
 	flash_timer.connect("timeout", self, "_on_flash_timer_timeout")
 	
 	
@@ -137,7 +130,11 @@ func sense() -> Array:
 			elif collided_object.is_in_group("danger"):
 				senses.append(-1)  # -1 represents danger
 			elif collided_object.is_in_group("booger") and collided_object != self:
-				senses.append(2)  # 2 represents other boogers (potential prey)
+				if collided_object.is_in_group("predator"):
+#					print("SEEN PREDATOR!")
+					senses.append(-2)  # -2 represents predator boogers
+				else:
+					senses.append(2)  # 2 represents other boogers (potential prey)
 			else:
 				senses.append(0)  # 0 for other objects
 		else:
@@ -154,32 +151,42 @@ func act(actions: Array) -> void:
 	"""Use the networks output to control the creature's movement.
 	"""
 	var torque = steering_torque
-
 	# accelerate
-	if actions[0] > 0.3:
+	if actions[0] > 0.0:
 		_velocity = -transform.y * acceleration * 15
 	# break & reverse
-	elif actions[1] > 0.3:
+	elif actions[1] > 0.0:
 		_velocity = transform.y * acceleration * 15
 	else:
 		_velocity = Vector2(0, 0)
 
 	# steer right
-	if actions[2] > 0.2:
-		_angular_velocity = range_lerp(actions[2], 0.2, 1, 0, 1) * torque
+	if actions[2] > 0.0:
+#		_angular_velocity = range_lerp(actions[2], 0.2, 1, 0, 1) * torque
+		_angular_velocity = actions[2] * torque
 	# steer left
-	elif actions[3] > 0.2:
-		_angular_velocity = range_lerp(actions[3], 0.2, 1, 0, 1) * -torque
+	elif actions[3] > 0.0:
+#		_angular_velocity = range_lerp(actions[3], 0.2, 1, 0, 1) * -torque
+		_angular_velocity = actions[3] * -torque
 	else:
 		_angular_velocity = 0
 
 	# eat other boogers
 	if actions[4] > 0.5:
-		energy -= 0.2
-		var prey = get_preys_in_range(60)  # Adjust range to suit your needs
+		add_to_group("predator")
+
+		var prey = get_preys_in_range(eat_radius)  #Eat nearest prey in the radius
 		if prey:
-#			print("EATEN!")
 			eat(prey)
+			
+		flash_red_sprite()
+		if get_node("Sprite").scale != Vector2(0.3, 0.3):
+			get_node("Sprite").scale = Vector2(0.3, 0.3)
+			get_node("Sprite").texture = load("res://demos/cars/car/Cannibal_Booger.png")
+
+		
+
+		energy -= 0.45
 
 	# Prevent exceeding max velocity
 	var max_speed = (Vector2(0, -1) * max_forward_velocity).rotated(rotation)
@@ -204,22 +211,21 @@ func get_fitness() -> float:
 	return food_score + life_score
 
 func eat(prey):
-	get_node("Sprite").scale = Vector2(0.3, 0.3)
-	get_node("Sprite").texture = load("res://demos/cars/car/Cannibal_Booger.png")
-	energy += prey.energy * 0.5  # Predator gains 50% of prey's energy
+	energy += 3  # Predator gains 50% of prey's energy4
 	prey.die()
 
 	# Make the sprite flash red
-	flash_red_sprite()
+
 	
 
 func flash_red_sprite() -> void:
-	OG_COLOR = get_node("Sprite").modulate
-	get_node("Sprite").modulate = Color(1, 0, 0)  # Change the sprite color to red
+#	get_node("Sprite").self_modulate = Color(1, 0, 0)  # Change the sprite color to red
+	get_child(5).visible = true #show area of attack using highlighter
 	flash_timer.start()  # Start the timer to revert the color after half a second
 
 func _on_flash_timer_timeout() -> void:
-	get_node("Sprite").modulate = OG_COLOR  # Revert the sprite color back to normal
+	get_child(5).visible = false
+#	get_node("Sprite").self_modulate = Color(1, 1, 1)  # Revert the sprite color back to normal
 
 # ---------- CRASHING
 

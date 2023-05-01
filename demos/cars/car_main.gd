@@ -31,7 +31,7 @@ onready var tree = preload("res://NEAT_usability/gui/graph/tree.tscn")
 
 
 #old config: car_params
-var ga = GeneticAlgorithm.new(18, 5, agent_body_path, true, "Custom_Evolution_Config")
+var ga = GeneticAlgorithm.new(34, 5, agent_body_path, true, "Custom_Evolution_Config")
 
 # chosen track. Tracks are numbered, however the car_splash refers to them by difficulty
 var curr_track_num: int
@@ -98,7 +98,7 @@ func _physics_process(delta) -> void:
 			place_bodies(ga.get_curr_bodies())
 			# every x gens, increase the generation_step
 			if ga.curr_generation % 2 == 0:
-				generation_step = min(generation_step + 2, 65)
+				generation_step = min(generation_step + 1, 35)
 				print("increased step to " + str(generation_step))
 			total_time = 0
 
