@@ -110,19 +110,27 @@ func draw_family_tree(family_tree):
 	draw_connections(nodes)
 
 func calculate_node_positions(nodes, generations):
-	var generation_offset = 150
+	var generation_offset = 300
 	var sibling_offset = 150
 
+	var tree_width = calculate_tree_width(generations, sibling_offset)
+	
 	for gen in generations:
 		var siblings = generations[gen]
-		var sibling_count = siblings.size()
-		var total_width = (sibling_count - 1) * sibling_offset
-		var x_pos_start = rect_size.x / 2 - total_width / 2
-
-		for i in range(sibling_count):
+		var total_sibling_count = siblings.size()
+		var x_start = (tree_width - total_sibling_count * sibling_offset) / 2
+		for i in range(siblings.size()):
 			var node = siblings[i]
-			var x_pos = x_pos_start + i * sibling_offset
+			var x_pos = x_start + i * sibling_offset
 			node.position = Vector2(x_pos, gen * generation_offset)
+
+
+var highlighted_lines = []
+func reset_line_colors():
+	for line in highlighted_lines:
+		line.default_color = Color(0, 0, 0, 0)
+	highlighted_lines.clear()
+
 
 
 static func sum_array(array):
@@ -170,6 +178,13 @@ func draw_nodes(nodes):
 		added_elements.append(label)
 
 
+		# Inside the draw_nodes function, after creating the rect and label, add:
+		rect.connect("mouse_entered", self, "_on_node_mouse_entered", [node])
+		rect.connect("mouse_exited", self, "_on_node_mouse_exited", [node])
+		label.connect("mouse_entered", self, "_on_node_mouse_entered", [node])
+		label.connect("mouse_exited", self, "_on_node_mouse_exited", [node])
+
+
 		# Check if this rectangle is the bottom-right most
 		if rect.rect_position.x > bottom_right_rect.x:
 			bottom_right_rect.x = rect.rect_position.x
@@ -205,6 +220,22 @@ func draw_nodes(nodes):
 
 		print("Bottom-right most rectangle coordinates: ", target_size)
 
+func _on_node_mouse_entered(node):
+	reset_line_colors()
+	for connection in node.connections:
+		var line = Line2D.new()
+		line.width = 4
+		line.default_color = Color(1, 0, 0)
+
+		line.add_point(node.position + Vector2(25, 50 if connection.generation > node.generation else 0))
+
+		line.add_point(connection.position + Vector2(25, 50 if connection.generation < node.generation else 0))
+
+		add_child(line)
+		highlighted_lines.append(line)
+
+func _on_node_mouse_exited(node):
+	reset_line_colors()
 
 func draw_connections(nodes):
 	
