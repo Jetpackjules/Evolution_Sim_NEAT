@@ -1,95 +1,93 @@
 extends Node2D
-#
-#
-#
-## Sample creatures array
-#
-##onready var Main_Overseer = preload("res://demos/cars/CarMain.tscn")
-#
-## Family tree nodes
-#var tree_nodes = {}
-#var orphan_nodes = {}
-#
-## UI elements
-#var panel
-#var panel_parent
-#var panel_parent_OG_size
-#	# Use the example creatures array
-#class Creature:
-#	var id
-#	var parent1_id
-#	var parent2_id
-#
-#	func _init(_id, parent1_id2, parent2_id2):
-#		id = _id
-#		parent1_id = parent1_id2
-#		parent2_id = parent2_id2
-#
-#
-#func generate_family(x):
-#	var creatures = []
-#	creatures.append(Creature.new(1, 0, 0))
-#	creatures.append(Creature.new(2, 0, 0))
-#	for i in range(3, x + 1):
-#		var parent1_id = randi() % (i - 1) + 1
-#		var parent2_id = randi() % (i - 1) + 1
-#		creatures.append(Creature.new(i, parent1_id, parent2_id))
-#	return creatures
-#
-#
-#
-#func _ready():
-#	get_tree().get_root().set_transparent_background(true)
-##	Initialize the panel
-#	panel = $CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control/Panel
-#	panel_parent = $CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control
-#	panel_parent_OG_size = panel_parent.rect_size
-#
-#var zoom_level: float = 1.0
-#var zoom_speed: float = 0.1
-#var min_zoom: float = -10.0
-#var max_zoom: float = 100.0
-#
-#func _input(event):
-#	if event is InputEventKey:
-#		if event.pressed:
-#			var prev_zoom_level = zoom_level
-#
-#			if event.is_action_pressed("zoom_in"):
-#				print("ZOOMING IN")
-#				zoom_level += zoom_speed
-#			elif event.is_action_pressed("zoom_out"):
-#				print("ZOOMING OUT")
-#				zoom_level -= zoom_speed
-#
-##			zoom_level = clamp(zoom_level, min_zoom, max_zoom)
-#
-#			var scroll_container = panel_parent.get_parent()
-#			var zoom_factor = zoom_level / prev_zoom_level
-#
-#
-#			panel.rect_scale = Vector2(zoom_level, zoom_level)
-#			panel_parent.rect_min_size = panel_parent_OG_size*zoom_level
-#
-#			scroll_container.scroll_horizontal *= zoom_factor
-#			scroll_container.scroll_vertical *= zoom_factor
-#
-#func clear_family_tree():
-#	for node in tree_nodes.values():
-#		node.queue_free()
-#
-#	for node in orphan_nodes.values():
-#		node.queue_free()
-#
-#	for child in panel.get_children():  # Loop through all panel children
-#		if child is Line2D:  # Check if the child is a Line2D node
-#			child.queue_free()  # Free the Line2D node
-#
-#	tree_nodes.clear()
-#	orphan_nodes.clear()
-#
-#
-#
+
+
+
+# Sample creatures array
+
+#onready var Main_Overseer = preload("res://demos/cars/CarMain.tscn")
+
+# Family tree nodes
+var tree_nodes = {}
+var orphan_nodes = {}
+
+# UI elements
+var panel
+var panel_parent
+var panel_parent_OG_size
+	# Use the example creatures array
+class Creature:
+	var id
+	var parent1_id
+	var parent2_id
+
+	func _init(_id, parent1_id2, parent2_id2):
+		id = _id
+		parent1_id = parent1_id2
+		parent2_id = parent2_id2
+
+
+func generate_family(x):
+	var creatures = []
+	creatures.append(Creature.new(1, 0, 0))
+	creatures.append(Creature.new(2, 0, 0))
+	for i in range(3, x + 1):
+		var parent1_id = randi() % (i - 1) + 1
+		var parent2_id = randi() % (i - 1) + 1
+		creatures.append(Creature.new(i, parent1_id, parent2_id))
+	return creatures
+
+
+
+func _ready():
+	get_tree().get_root().set_transparent_background(true)
+#	Initialize the panel
+	panel = $CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control/Panel
+	panel_parent = $CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control
+	panel_parent_OG_size = panel_parent.rect_size
+
+var zoom_level: float = 1.0
+var zoom_speed: float = 0.1
+var min_zoom: float = -10.0
+var max_zoom: float = 100.0
+
+func _input(event):
+	if event is InputEventKey:
+		if event.pressed:
+			var prev_zoom_level = zoom_level
+
+			if event.is_action_pressed("zoom_in"):
+				print("ZOOMING IN")
+				zoom_level += zoom_speed
+			elif event.is_action_pressed("zoom_out"):
+				print("ZOOMING OUT")
+				zoom_level -= zoom_speed
+
+#			zoom_level = clamp(zoom_level, min_zoom, max_zoom)
+
+			var scroll_container = panel_parent.get_parent()
+			var zoom_factor = zoom_level / prev_zoom_level
+
+
+			panel.rect_scale = Vector2(zoom_level, zoom_level)
+			panel_parent.rect_min_size = panel_parent_OG_size*zoom_level
+
+			scroll_container.scroll_horizontal *= zoom_factor
+			scroll_container.scroll_vertical *= zoom_factor
+
+func clear_family_tree():
+	for node in tree_nodes.values():
+		node.queue_free()
+
+	for node in orphan_nodes.values():
+		node.queue_free()
+
+	for child in panel.get_children():  # Loop through all panel children
+		if child is Line2D:  # Check if the child is a Line2D node
+			child.queue_free()  # Free the Line2D node
+
+	tree_nodes.clear()
+	orphan_nodes.clear()
+
 #func generate_family_tree(creatures):
 #	clear_family_tree()
 #	var creatures_dict = {}
@@ -187,19 +185,24 @@ extends Node2D
 #		if creature.parent2_id != 0 and creature.parent2_id in tree_nodes:
 #			line.add_point(tree_nodes[creature.parent2_id].position)
 #			line.add_point(tree_nodes[creature.id].position)
-#
-#
-#func cycle(creatures):
-#	print("CYCLE!")
-#	if $CanvasLayer/Control/FamilyTreeWindow.visible == false:
-#		generate_family_tree(creatures)
-#		$CanvasLayer/Control/FamilyTreeWindow.popup_centered()
-#		panel_parent_OG_size = panel_parent.rect_size
-#	else:
-#		$CanvasLayer/Control/FamilyTreeWindow.visible = false
-#
-#
-#
+
+
+func cycle(creatures):
+	print("CYCLE!")
+	if $CanvasLayer/Control/FamilyTreeWindow.visible == false:
+		$CanvasLayer/Control/FamilyTreeWindow.popup_centered()
+		panel_parent_OG_size = panel_parent.rect_size
+#		clear_family_tree()
+		panel.draw_family_tree(creatures)
+	else:
+		$CanvasLayer/Control/FamilyTreeWindow.visible = false
+	print("------")
+	print($CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control.rect_min_size)
+	print($CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control/Panel.rect_min_size)
+	print("----------")
+
+
+
 ##FOR PYTHON EXPORT:
 #func save_creatures_to_gedcom(creatures):
 #	var file = File.new()

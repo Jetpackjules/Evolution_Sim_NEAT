@@ -75,7 +75,7 @@ func _physics_process(delta) -> void:
 	according to the networks output. If generation_step time has passed, start a
 	new generation.
 	"""
-	if not paused:	
+	if not paused:
 		# update time since last update
 		time += delta; total_time += delta
 		# if enough time has passed for the next time_step, update all agents
@@ -84,8 +84,11 @@ func _physics_process(delta) -> void:
 			time = 0
 		# check if enough time has passed to start a new generation
 		if total_time > generation_step or ga.all_agents_dead:
-			
-				
+
+			for creature in ga.alive:
+				creature.body.age += 1
+
+
 			# check if the best agent exceeded the fitness threshold
 			ga.evaluate_generation()
 			if ga.curr_best.fitness > fitness_threshold:
@@ -93,7 +96,7 @@ func _physics_process(delta) -> void:
 				end_car_demo()
 			# go to the next gen
 			ga.next_generation()
-			
+
 
 			place_bodies(ga.get_curr_bodies())
 			# every x gens, increase the generation_step

@@ -1,5 +1,6 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
+[ext_resource path="res://demos/cars/tracks/track_4/Tree_Panel.gd" type="Script" id=1]
 [ext_resource path="res://demos/cars/tracks/track_1/track_1.png" type="Texture" id=2]
 [ext_resource path="res://demos/cars/tracks/track_4/tree.gd" type="Script" id=3]
 [ext_resource path="res://demos/cars/tracks/track_4/Food_Spawner.gd" type="Script" id=5]
@@ -169,14 +170,11 @@ position = Vector2( -900, 1151 )
 [node name="Natural_food" type="Position2D" parent="Food_Spawner"]
 
 [node name="FamilyTree" type="Node2D" parent="."]
-visible = false
 script = ExtResource( 3 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="FamilyTree"]
-visible = false
 
 [node name="Control" type="Control" parent="FamilyTree/CanvasLayer"]
-visible = false
 margin_left = 516.0
 margin_top = 68.0
 margin_right = 916.0
@@ -198,17 +196,18 @@ follow_focus = true
 
 [node name="Control" type="Control" parent="FamilyTree/CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer"]
 self_modulate = Color( 1, 1, 1, 0 )
-margin_right = 400.0
-margin_bottom = 500.0
+anchor_right = 1.0
+anchor_bottom = 1.0
 rect_min_size = Vector2( 400, 500 )
 rect_clip_content = true
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Panel" type="Panel" parent="FamilyTree/CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control"]
-self_modulate = Color( 1, 1, 1, 0 )
-margin_right = 400.0
-margin_bottom = 500.0
-rect_min_size = Vector2( 200, 200 )
+self_modulate = Color( 0.227451, 0.847059, 0.929412, 0.913725 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 400, 500 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
+script = ExtResource( 1 )

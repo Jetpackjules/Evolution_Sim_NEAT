@@ -46,6 +46,7 @@ onready var flash_timer = get_node("Timer")
 # signal that let's the controlling agent know it just died
 signal death
 
+var age = 0
 
 func _ready() -> void:
 	"""Connect the car to the bounds of the track, receive a signal when (any) car
@@ -60,6 +61,7 @@ func _ready() -> void:
 	energy = 2.5
 	life_score = 0.0
 	energy_consumption_multiplier = 1.0
+	age = 0
 	# Generate specified number of raycasts 
 	var cast_angle = 0
 	var cast_arc = TAU / num_casts
@@ -99,6 +101,18 @@ func _physics_process(_delta) -> void:
 	starve()
 	life_score += _delta
 	
+	
+	if age == 1:
+		var sprite = get_node("Sprite")
+
+		if is_in_group("predator"): # make into predator booger:
+			sprite.texture = load("res://demos/cars/car/Cannibal_Booger.png")
+			sprite.scale = Vector2(0.3, 0.3)
+
+		else: #Make into adult booger:
+			sprite.texture = load("res://demos/cars/car/booger_adult.png")
+			sprite.scale = Vector2(0.201, 0.201)
+
 
 
 func get_up_velocity() -> Vector2:
@@ -130,11 +144,13 @@ func sense() -> Array:
 			elif collided_object.is_in_group("danger"):
 				senses.append(-1)  # -1 represents danger
 			elif collided_object.is_in_group("booger") and collided_object != self:
-				if collided_object.is_in_group("predator"):
-#					print("SEEN PREDATOR!")
-					senses.append(-2)  # -2 represents predator boogers
+				if (collided_object.age == 0) and (age != 0):
+					senses.append(2) # to for child boogers that don't yield energy...
+#				elif collided_object.is_in_group("predator"):
+##					print("SEEN PREDATOR!")
+#					senses.append(-2)  # -2 represents predator boogers
 				else:
-					senses.append(2)  # 2 represents other boogers (potential prey)
+					senses.append(3)  # 2 represents other boogers (potential prey)
 			else:
 				senses.append(0)  # 0 for other objects
 		else:
@@ -173,19 +189,13 @@ func act(actions: Array) -> void:
 
 	# eat other boogers
 	if actions[4] > 0.5:
-		add_to_group("predator")
 
 		var prey = get_preys_in_range(eat_radius)  #Eat nearest prey in the radius
 		if prey:
 			eat(prey)
 			
 		flash_red_sprite()
-		if get_node("Sprite").scale != Vector2(0.3, 0.3):
-			get_node("Sprite").scale = Vector2(0.3, 0.3)
-			get_node("Sprite").texture = load("res://demos/cars/car/Cannibal_Booger.png")
-
-		
-
+		add_to_group("predator")
 		energy -= 0.45
 
 	# Prevent exceeding max velocity
@@ -211,7 +221,8 @@ func get_fitness() -> float:
 	return food_score + life_score
 
 func eat(prey):
-	energy += 3  # Predator gains 50% of prey's energy4
+	if (age == 0) or (prey.age != 0):
+		energy += 3  # Predator gains 3 energy, unless child, in which case nothing...
 	prey.die()
 
 	# Make the sprite flash red
