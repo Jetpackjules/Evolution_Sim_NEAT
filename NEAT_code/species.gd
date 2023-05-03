@@ -8,7 +8,10 @@ This grouping is necessary to achieve 'fitness sharing', meaning that the fitnes
 of individual members contributes to the fitness of the entire species, which in
 turn determines how many new members the species will spawn in the next generation.
 """
-
+var parent_id: String
+var generation: int
+var children_ids = []
+var angle: float
 # unique string consisting of the generation the species was founded in, and the
 # genome that founded species
 var species_id: String
@@ -40,6 +43,7 @@ var obliterate = false
 # The amount of offspring to be spawned in the next generation
 var num_to_spawn = 0
 
+
 # if the species doesn't improve for Params.enough_gens_to_change_things, the rates
 # of mutations change to their second (heightened) value. this changes back if the
 # species improves again.
@@ -48,16 +52,23 @@ var curr_mutation_rate = Params.MUTATION_RATE.normal
 # allowed_gens_no_improvement of stale generations.
 var num_gens_no_improvement = 0
 
+
 var color = Color(0.0, 0.0, 0.0, 1.0)
 
-func _init(id: String, original_color: Color = Color(randf(), randf(), randf(), 1.0)) -> void:
+var id
+
+func _init(input_id: String, parent_id_input: String = "", generation_input: int = 0, original_color: Color = Color(randf(), randf(), randf(), 1.0)) -> void:
 	"""Creates a new species
 	"""
-	species_id = id
+	id = input_id
+	species_id = input_id
+	parent_id = parent_id_input
+	generation = generation_input
+
 	var difference = 0.25
-	color = Color(clamp(original_color.r + rand_range(-difference, difference), 0, 1),
-		 clamp(original_color.g + rand_range(-difference, difference), 0, 1),
-		 clamp(original_color.b + rand_range(-difference, difference), 0, 1), 1.0)
+	color = Color(clamp(original_color.r + rand_range(-difference/2, difference), 0, 1),
+		 clamp(original_color.g + rand_range(-difference/2, difference), 0, 1),
+		 clamp(original_color.b + rand_range(-difference/2, difference), 0, 1), 1.0)
 
 
 

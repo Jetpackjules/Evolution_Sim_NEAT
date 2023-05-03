@@ -5,9 +5,9 @@ var Food = load("res://demos/cars/tracks/track_4/Food.tscn")
 export (int) var spawn_range = 250
 export (int) var max_attempts = 10
 
-export (float) var time_interval = 10
-export (float) var bush_spawn = 0
-export (float) var area_spawn = 22
+export (float) var time_interval = 10.0
+export (float) var bush_spawn = 0.0
+export (float) var area_spawn = 22.0
 
 var rng = RandomNumberGenerator.new()
 

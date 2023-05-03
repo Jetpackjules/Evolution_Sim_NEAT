@@ -68,11 +68,11 @@ func _input(event):
 			var zoom_factor = zoom_level / prev_zoom_level
 
 
-			panel.rect_scale = Vector2(zoom_level, zoom_level)
+#			panel.rect_scale = Vector2(zoom_level, zoom_level)
 			panel_parent.rect_min_size = panel_parent_OG_size*zoom_level
 
-			scroll_container.scroll_horizontal *= zoom_factor
-			scroll_container.scroll_vertical *= zoom_factor
+#			scroll_container.scroll_horizontal *= zoom_factor
+#			scroll_container.scroll_vertical *= zoom_factor
 
 func clear_family_tree():
 	for node in tree_nodes.values():
@@ -187,19 +187,21 @@ func clear_family_tree():
 #			line.add_point(tree_nodes[creature.id].position)
 
 
-func cycle(creatures):
-	print("CYCLE!")
+func cycle(species):
+#	print("CYCLE!")
 	if $CanvasLayer/Control/FamilyTreeWindow.visible == false:
 		$CanvasLayer/Control/FamilyTreeWindow.popup_centered()
 		panel_parent_OG_size = panel_parent.rect_size
 #		clear_family_tree()
-		panel.draw_family_tree(creatures)
+#		var test_gens = generate_family(100)
+		panel.draw_species_map(species)
+#		panel.draw_family_tree(creatures)
 	else:
 		$CanvasLayer/Control/FamilyTreeWindow.visible = false
-	print("------")
-	print($CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control.rect_min_size)
-	print($CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control/Panel.rect_min_size)
-	print("----------")
+#	print("------")
+#	print($CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control.rect_min_size)
+#	print($CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control/Panel.rect_min_size)
+#	print("----------")
 
 
 

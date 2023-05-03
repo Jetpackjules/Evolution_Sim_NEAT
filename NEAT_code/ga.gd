@@ -278,11 +278,11 @@ func next_generation() -> void:
 
 			# Choose one of the parents' positions randomly
 			var parent_position
-			if (parent1.body) and (parent2.body):
-				parent_position = parent1.body.position if Utils.random_f() < 0.5 else parent2.body.position				
-			elif parent1.body:
+			if is_instance_valid(parent1.body) and is_instance_valid(parent2.body):
+				parent_position = parent1.body.position if Utils.random_f() < 0.5 else parent2.body.position
+			elif is_instance_valid(parent1.body):
 				parent_position = parent1.body.position
-			elif parent2.body:
+			elif is_instance_valid(parent2.body):
 				parent_position = parent2.body.position
 			else:
 #				print("FAILED TO FIND PARENT!")
@@ -320,12 +320,6 @@ func next_generation() -> void:
 	emit_signal("made_new_gen")
 	# reset is_first_timestep so it is true for the first call to next_timestep()
 	is_first_timestep = true
-	if all_species.empty():
-		all_species = curr_species
-	else:
-		for species in curr_species:
-			if not (species in all_species):
-				all_species.append(species)
 	generation_evaluated = false
 
 
@@ -355,15 +349,19 @@ func make_new_species(founding_member: Genome) -> Species:
 	var new_species_id = str(curr_generation) + "_" + str(founding_member.id)
 
 	var color = null
+	var generation = 1
 	for species in curr_species:
 		if species.species_id == founding_member.species_id:
 			color = species.color
-			
+			generation = species.generation + 1
+			species.children_ids.append(new_species_id)
+	
+	
 	var new_species
 	if color:
-		new_species = Species.new(new_species_id, color)
+		new_species = Species.new(new_species_id, founding_member.species_id, generation, color)
 	else:
-		new_species = Species.new(new_species_id)
+		new_species = Species.new(new_species_id, founding_member.species_id, generation)
 		
 		
 	new_species.representative = founding_member
@@ -428,7 +426,7 @@ func finish_current_agents() -> void:
 	curr_agents.clear()
 	curr_agents = alive
 
-
+var first = true
 func update_curr_species() -> Array:
 	"""Determines which species will get to reproduce in the next generation.
 	Calls the Species.update() method, which determines the species fitness as a
@@ -437,6 +435,14 @@ func update_curr_species() -> Array:
 	generation.
 	"""
 	num_dead_species = 0
+	
+	if !first:
+		for species in curr_species:
+			if not species.obliterate and not (species in all_species):
+				all_species.append(species)
+	first = false
+
+	
 	# find the fittest genome from the last gen. Start with a random genome to allow comparison
 	curr_best = Utils.random_choice(curr_genomes)
 	# sum the average fitnesses of every species, and sum the average unadjusted fitness

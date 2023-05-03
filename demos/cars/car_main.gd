@@ -176,6 +176,6 @@ func get_everyone() -> Array:
 func _unhandled_input(event):
 	if event is InputEventKey and event.pressed:
 		if event.scancode == KEY_ENTER:
-			print("GENOMES: ", len(ga.all_genomes))
-			$Track/FamilyTree.cycle(ga.all_genomes)
+#			print("GENOMES: ", len(ga.all_genomes))
+			$Track/FamilyTree.cycle(ga.all_species)
 			pass
