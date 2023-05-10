@@ -72,9 +72,10 @@ func start_demo() -> void:
 			# scene needs to be instanced in order to pass parameters to it.
 			var car_main = load("res://demos/cars/CarMain.tscn").instance()
 			# pass the selected track to the instanced scene
+			switch_to_instanced_scene(car_main)
 			car_main.load_track(track_num)
 			# switch to car_main scene instance
-			switch_to_instanced_scene(car_main)
+#			switch_to_instanced_scene(car_main)
 		DEMO_MODE.race:
 			# instance a racing scene
 			var car_race_main = load("res://demos/cars/race_mode/CarRaceMain.tscn").instance()

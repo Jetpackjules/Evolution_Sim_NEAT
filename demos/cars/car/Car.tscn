@@ -1,8 +1,40 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://demos/cars/car/booger_baby.png" type="Texture" id=1]
 [ext_resource path="res://demos/cars/car/car.gd" type="Script" id=2]
 [ext_resource path="res://demos/cars/car/explosion.png" type="Texture" id=3]
+[ext_resource path="res://NEAT_usability/fonts/Data/Roboto-Light.ttf" type="DynamicFontData" id=4]
+
+[sub_resource type="Shader" id=24]
+resource_local_to_scene = true
+code = "shader_type canvas_item;
+
+uniform float line_width : hint_range(0.0, 60.0) = 2.0;
+uniform vec4 line_color : hint_color = vec4(1.0, 0.0, 0.0, 1.0);
+
+void fragment() {
+    vec4 sprite_color = texture(TEXTURE, UV);
+    vec4 outline_color = vec4(0.0, 0.0, 0.0, 0.0);
+
+    float dist = line_width / 2.0;
+    for (float x = -dist; x <= dist; x += 1.0) {
+        for (float y = -dist; y <= dist; y += 1.0) {
+            vec2 offset = vec2(x, y) / vec2(textureSize(TEXTURE, 0));
+            vec4 tex_color = texture(TEXTURE, UV + offset);
+            outline_color.rgb = line_color.rgb;
+            outline_color.a = max(outline_color.a, tex_color.a);
+        }
+    }
+
+    COLOR = mix(outline_color, sprite_color, sprite_color.a);
+}
+"
+
+[sub_resource type="ShaderMaterial" id=23]
+resource_local_to_scene = true
+shader = SubResource( 24 )
+shader_param/line_width = 0.0
+shader_param/line_color = Color( 1, 0, 0, 1 )
 
 [sub_resource type="DynamicFontData" id=17]
 resource_local_to_scene = true
@@ -87,12 +119,19 @@ animations = [ {
 "speed": 10.0
 } ]
 
+[sub_resource type="DynamicFont" id=19]
+size = 14
+outline_size = 1
+font_data = ExtResource( 4 )
+
 [node name="Car" type="RigidBody2D" groups=["booger"]]
 rotation = 1.5708
 collision_mask = 0
+input_pickable = true
 script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
+material = SubResource( 23 )
 position = Vector2( 1, 0.999996 )
 rotation = -1.5708
 scale = Vector2( 0.125523, 0.125523 )
@@ -116,12 +155,27 @@ visible = false
 scale = Vector2( 0.7, 0.7 )
 frames = SubResource( 14 )
 
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2( 0.5, 0.5 )
-
 [node name="Timer" type="Timer" parent="."]
 process_mode = 0
 wait_time = 0.15
 one_shot = true
 
+[node name="InfoScreen" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="Panel" type="Panel" parent="InfoScreen"]
+margin_right = 350.0
+margin_bottom = 500.0
+
+[node name="Label" type="Label" parent="InfoScreen/Panel"]
+margin_left = 10.0
+margin_top = 5.0
+margin_right = 50.0
+margin_bottom = 19.0
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 19 )
+text = "ter"
+uppercase = true
+
+[connection signal="input_event" from="." to="." method="_on_Car_input_event"]
 [connection signal="animation_finished" from="Explosion" to="." method="_on_Explosion_animation_finished"]

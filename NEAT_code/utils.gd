@@ -79,7 +79,7 @@ static func sort_and_remove_duplicates(arr: Array) -> Array:
 #	return result.empty()
 
 
-func check_collision_free(collision_node: Node, new_position, shape):
+func check_collision_free(collision_node, new_position, shape):
 	var space_state = get_tree().get_root().get_world_2d().direct_space_state
 	var query = Physics2DShapeQueryParameters.new()
 	

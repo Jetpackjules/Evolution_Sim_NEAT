@@ -7,6 +7,8 @@ evaluating them. It can be viewed as the main orchestrator of the evolution proc
 by delegating the exact details of how each step is achieved to the other classes
 within this directory.
 """
+var spawns = []
+
 var all_species := [] # To store all species across generations
 # curr_genome_id gets incremented for every new genome
 var curr_genome_id = 0
@@ -70,7 +72,8 @@ func _init(number_inputs: int,
 	Params.agent_body_path = body_path
 	Params.use_gui = use_gui
 	# create a new population of genomes
-	curr_genomes = create_initial_population()
+
+
 	# add the gui node as child
 	if use_gui:
 		gui = load("res://NEAT_usability/gui/NeatGUI.gd").new()
@@ -121,6 +124,7 @@ func create_initial_population() -> Array:
 	# --- generate the first generation of genomes
 	
 	var spawn_points = call_get_safe_spawn_points(Params.population_size, 3000)
+	spawns = spawn_points.duplicate()
 	
 	var initial_genomes = []
 	for _initial_genome in Params.population_size:
@@ -160,10 +164,10 @@ func create_initial_population() -> Array:
 		found_species.add_member(new_genome)
 		
 
-		
-#		spawn_points.pop_back()
 		curr_agents.append(new_genome.generate_agent(spawn_points.pop_back()))
 		initial_genomes.append(new_genome)
+		
+
 	# --- end of for loop that creates all genomes.
 	# pick random genome and species of first gen, to allow for comparison
 	all_time_best = Utils.random_choice(initial_genomes)
@@ -204,10 +208,11 @@ func get_agent_by_genome_id(genome_id: int) -> Agent:
 				print("Bodiless parent... :(")
 				
 #	print("Failed to find: ", genome_id)
+
 	return null
 
-
-
+func spawn_first_wave():
+	curr_genomes = create_initial_population()
 
 func next_generation() -> void:
 	"""Goes through every species, and tries to spawn their new members (=genomes)
@@ -291,7 +296,8 @@ func next_generation() -> void:
 				
 #			adding stagger margin:
 			var margin = 300
-			parent_position += Vector2(rand_range(-margin, margin), rand_range(-margin, margin))
+
+			parent_position += call_get_safe_spawn_points(1, margin, parent_position)[0]
 
 #				print(type)
 			# Update the generate_agent() call
@@ -313,7 +319,11 @@ func next_generation() -> void:
 		all_genomes = Utils.sort_and_remove_duplicates(all_genomes)
 #		print("TOTAL GENOMES: ", str(len(all_genomes)))
 	
-	# update curr_genomes alias
+	# Carrying over old genomes that survived:
+	for genome in curr_genomes:
+		if !genome.agent.is_dead:
+			new_genomes.append(genome)
+		
 	curr_genomes = new_genomes
 	all_agents_dead = false
 	# let ui know that it should update the species list
@@ -365,6 +375,8 @@ func make_new_species(founding_member: Genome) -> Species:
 		
 		
 	new_species.representative = founding_member
+	new_species.alive_members.append(founding_member)
+	
 	curr_species.append(new_species)
 	num_new_species += 1
 	return new_species
@@ -388,7 +400,9 @@ func next_timestep() -> void:
 		if not agent.is_dead:
 			agent.process_inputs()
 			new_agents.append(agent)
-#			agent.body.get_node("Sprite").modulate = Color(randf(), randf(), randf(), 1.0)
+#		else:
+#			breakpoint
+#			agent.body.get_node("Sprite").modulate = Color(1, 1, 1, 1.0)
 
 	# replace curr_agents with all agents that are alive, therefore removing dead ones
 	curr_agents = new_agents
@@ -423,7 +437,7 @@ func finish_current_agents() -> void:
 #			
 
 	# clear the agents array
-	curr_agents.clear()
+#	curr_agents.clear()
 	curr_agents = alive
 
 var first = true
@@ -437,9 +451,27 @@ func update_curr_species() -> Array:
 	num_dead_species = 0
 	
 	if !first:
+#		for species in curr_species:
+#			if not species.obliterate and not (species in all_species):
+#				all_species.append(species)
+
 		for species in curr_species:
-			if not species.obliterate and not (species in all_species):
-				all_species.append(species)
+			var species_ids = []
+			for s in all_species:
+				species_ids.append(s["species_id"])
+
+			if species.species_id in species_ids:
+				var index = species_ids.find(species.species_id)
+				var current_species = all_species[index]
+				if species.obliterate != current_species["obliterate"] or species.predator != current_species["predator"]:
+					all_species[index] = species.to_dict()
+			else:
+				if not species.obliterate:
+					all_species.append(species.to_dict())
+
+
+
+
 	first = false
 
 	
@@ -625,9 +657,10 @@ func update_visibility(index: int) -> void:
 			get_tree().call_group("all_bodies", "hide")
 
 
-func call_get_safe_spawn_points(amount, distance):
-	var Food_Spawner_node = Global.track_instance.get_node("Food_Spawner")
-	var spawn_points = Food_Spawner_node.get_safe_spawn_points(amount, distance)
-	Global.track_instance.queue_free()
-	return spawn_points
 
+
+func call_get_safe_spawn_points(amount, distance, location = Vector2(0,0)):
+	amount += 1
+	var Food_Spawner_node = get_node("../Track/Food_Spawner")
+	var spawn_points = Food_Spawner_node.get_safe_spawn_points(amount, distance, location)
+	return spawn_points

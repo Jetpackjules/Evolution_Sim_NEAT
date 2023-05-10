@@ -8,7 +8,7 @@ func _ready() -> void:
 	animation_player.play("ColorChange")
 
 func touched(body) -> void:
-	if "Food" in name:
+	if body.is_in_group("booger"):
 		body.food_score += 0.5
 		body.energy += 1
 		
@@ -17,7 +17,7 @@ func touched(body) -> void:
 #		if sprite:
 #			sprite.scale = Vector2(new_size, new_size)
 			
-	queue_free()
+		queue_free()
 
 
 func _on_Timer_timeout():

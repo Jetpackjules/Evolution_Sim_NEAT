@@ -31,7 +31,7 @@ func bush_grow(amount, area):
 		if "Bush" in str(child.name):
 			renew(amount, area, child)
 		
-func get_safe_spawn_points(amount: int, area: int, location: Node = self):
+func get_safe_spawn_points(amount: int, area: int, location = self.position):
 	var spawn_points = []
 	var circle_shape = null
 	var new_position = Vector2()
@@ -45,13 +45,14 @@ func get_safe_spawn_points(amount: int, area: int, location: Node = self):
 		new_position = Vector2()
 			
 		while attempts < max_attempts and not position_found:
-			new_position = location.position + Vector2(rng.randf_range(-area, area), rng.randf_range(-area, area))
+			new_position = location + Vector2(rng.randf_range(-area, area), rng.randf_range(-area, area))
 
 			position_found = Utils.check_collision_free(location, new_position, circle_shape)
 			attempts += 1
 
 		if position_found:
-			spawn_points.append(new_position - location.position)
+			spawn_points.append(new_position - location)
+
 
 #	Removing sample food instance:
 	Food_Instance.queue_free()
@@ -67,6 +68,6 @@ func spawn_food_at_points(points, location):  # Add location as an argument
 
 func renew(amount: int = 1, area: int = 100, location: Node = $Natural_food):
 	rng.randomize()
-	var safe_spawn_points = get_safe_spawn_points(amount, area, location)
+	var safe_spawn_points = get_safe_spawn_points(amount, area, location.position)
 	spawn_food_at_points(safe_spawn_points, location)  # Pass location as an argument
 

@@ -10,11 +10,14 @@ high acceleration. All steering happens during the act() method.
 """
 
 # Driving Properties
+var actions_list = []
+
 var energy_consumption_multiplier = 1
 var acceleration = 15
 var max_forward_velocity = 1500
 var steering_torque = 5 # Affects turning speed
 
+var outline = false
 
 # Vehicle velocity and angular velocity. Override rigidbody velocity in physics process
 var _velocity = Vector2()
@@ -25,7 +28,7 @@ var speed: int
 
 # hold a specified num of raycasts in an array to sense the environment
 var raycasters = []
-var sight_range = 350
+var sight_range = 250
 var num_casts = 16
 
 var food_score = 0.0
@@ -48,10 +51,17 @@ signal death
 
 var age = 0
 
+
+var paused = false
+
 func _ready() -> void:
 	"""Connect the car to the bounds of the track, receive a signal when (any) car
 	collides with the bounds. Generate raycasts to measure the distance to the bounds.
 	"""
+#	connect("input_event", self, "_on_creature_input")
+
+	
+	
 	get_child(5).highlighter_radius = eat_radius
 	# connect a signal from track bounds, to detect when a crash occurs
 	get_node("../../Bounds").connect("body_entered", self, "crash")
@@ -78,40 +88,68 @@ func _ready() -> void:
 	flash_timer.connect("timeout", self, "_on_flash_timer_timeout")
 	
 	
+func _on_creature_input(event):
+	if event is InputEventMouseButton and event.pressed and event.button_index == BUTTON_LEFT:
+		$InfoScreen.visible = !$InfoScreen.visible
+		outline = !outline
+		if outline:
+			$Sprite.material.set_shader_param("line_width", 50.0)
+		else:
+			$Sprite.material.set_shader_param("line_width", 0.0)
+		$InfoScreen.offset = Vector2(OS.get_window_size().x-$InfoScreen/Panel.rect_size.x-10, 10)
+		update_info_screen()
+
+var agent_message = []
+func update_info_screen():
+	var actions_labels = ["Speed", "Turn", "Attack"]
+	var actions_str = ""
+	for i in range(len(actions_list)):
+		actions_str += "%s: %s\n" % [actions_labels[i], str(actions_list[i])]
+#	var agent = get_parent().get_parent().get_parent().print_tree_pretty()
+	
+	$InfoScreen/Panel/Label.text = "Groups: %s\nEnergy: %s\nLife Score: %s\nFood Score: %s\nAge: %s\n Agent: %s\n, Agnt Msg: %s\n, Angular Velocity: %s\nLinear Velocity: %s\nActions:\n%s" % [str(get_groups()), str(stepify(energy, 0.1)), str(life_score), str(food_score), str(age), str(act_times), str(agent_message), str(_angular_velocity), str(_velocity), actions_str]
+
+
+
 
 func _physics_process(_delta) -> void:
 	"""This script overrides the behavior of a rigidbody (Not my idea, but it works).
 	"""
-	# Show energy:
-	$Sprite/Label.text = str(stepify(energy, 0.1))
+	if !paused:
+		
+		if $InfoScreen.visible:
+			update_info_screen()
+		
+		# Show energy:
+		$Sprite/Label.text = str(stepify(energy, 0.1))
 
 
-	# Add drift to velocity
-	_velocity = get_up_velocity() + (get_right_velocity())
+		# Add drift to velocity
+		_velocity = get_up_velocity() + (get_right_velocity())
 
-	# Override Rigidbody movement
-	set_linear_velocity(_velocity)
-	set_angular_velocity(_angular_velocity)
-	
-	
-	# Update the forward speed
-	speed = -get_up_velocity().dot(transform.y)
-	
-	energy -= (_delta/6.0)*energy_consumption_multiplier
-	starve()
-	life_score += _delta
-	
-	
-	if age == 1:
-		var sprite = get_node("Sprite")
+		# Override Rigidbody movement
+		set_linear_velocity(_velocity)
+		set_angular_velocity(_angular_velocity)
+		
+		
+		# Update the forward speed
+		speed = -get_up_velocity().dot(transform.y)
+		
+		energy -= (_delta/6.0)*energy_consumption_multiplier
+		starve()
+		life_score += _delta
+		
+		
+		if age >= 1:
+			var sprite = get_node("Sprite")
 
-		if is_in_group("predator"): # make into predator booger:
-			sprite.texture = load("res://demos/cars/car/Cannibal_Booger.png")
-			sprite.scale = Vector2(0.3, 0.3)
+			if is_in_group("predator"): # make into predator booger:
+				sprite.texture = load("res://demos/cars/car/Cannibal_Booger.png")
+				sprite.scale = Vector2(0.3, 0.3)
 
-		else: #Make into adult booger:
-			sprite.texture = load("res://demos/cars/car/booger_adult.png")
-			sprite.scale = Vector2(0.201, 0.201)
+			else: #Make into adult booger:
+				sprite.texture = load("res://demos/cars/car/booger_adult.png")
+				sprite.scale = Vector2(0.201, 0.201)
 
 
 
@@ -162,33 +200,36 @@ func sense() -> Array:
 	senses.append(energy)
 	return senses
 
-
+var act_times = 0
 func act(actions: Array) -> void:
 	"""Use the networks output to control the creature's movement.
 	"""
+	act_times += 1
+	actions_list = actions
 	var torque = steering_torque
 	# accelerate
-	if actions[0] > 0.0:
-		_velocity = -transform.y * acceleration * 15
-	# break & reverse
-	elif actions[1] > 0.0:
-		_velocity = transform.y * acceleration * 15
-	else:
-		_velocity = Vector2(0, 0)
+#	if actions[0] > 0.0:
+	_velocity = -transform.y * acceleration * 15 * actions[0]
+#	# break & reverse
+#	elif actions[1] > 0.0:
+#		_velocity = transform.y * acceleration * 15
+#	else:
+#		_velocity = Vector2(0, 0)
 
 	# steer right
-	if actions[2] > 0.0:
-#		_angular_velocity = range_lerp(actions[2], 0.2, 1, 0, 1) * torque
-		_angular_velocity = actions[2] * torque
-	# steer left
-	elif actions[3] > 0.0:
-#		_angular_velocity = range_lerp(actions[3], 0.2, 1, 0, 1) * -torque
-		_angular_velocity = actions[3] * -torque
-	else:
-		_angular_velocity = 0
+	_angular_velocity = actions[1] * torque
+
+#	if actions[2] > 0.0:
+#		_angular_velocity = actions[2] * torque
+#	# steer left
+#	elif actions[3] > 0.0:
+##		_angular_velocity = range_lerp(actions[3], 0.2, 1, 0, 1) * -torque
+#		_angular_velocity = actions[3] * -torque
+#	else:
+#		_angular_velocity = 0
 
 	# eat other boogers
-	if actions[4] > 0.5:
+	if actions[2] > 0.5:
 
 		var prey = get_preys_in_range(eat_radius)  #Eat nearest prey in the radius
 		if prey:
@@ -221,9 +262,10 @@ func get_fitness() -> float:
 	return food_score + life_score
 
 func eat(prey):
-	if (age == 0) or (prey.age != 0):
-		energy += 3  # Predator gains 3 energy, unless child, in which case nothing...
-	prey.die()
+	if !prey.dead:
+		if (age == 0) or (prey.age != 0):
+			energy += 3  # Predator gains 3 energy, unless child, in which case nothing...
+		prey.die()
 
 	# Make the sprite flash red
 
@@ -241,14 +283,21 @@ func _on_flash_timer_timeout() -> void:
 # ---------- CRASHING
 
 func die() -> void:
-	if is_in_group("booger"):
-		remove_from_group("booger")
-		set_linear_velocity(Vector2(0,0))
-		set_physics_process(false)
-		$Explosion.show(); $Explosion.play()
-		$Sprite.hide()
-		dead = true
-		emit_signal("death")
+#	if is_in_group("booger"):
+#		remove_from_group("booger")
+	$CarCollider.set_deferred("disabled", true)
+	set_linear_velocity(Vector2(0,0))
+	set_angular_velocity(0)
+	paused = true
+#	set_collision_layer_bit(1, false)
+	
+#	set_physics_process(false)
+
+	$Explosion.show(); $Explosion.play()
+	$Sprite.hide()
+	dead = true
+	emit_signal("death")
+
 	
 
 
@@ -280,3 +329,14 @@ func _input(event):
 		if event.pressed:
 			if event.is_action_pressed("cycle_labels"):
 				$Sprite/Label.visible = !$Sprite/Label.visible
+				$InfoScreen.visible = false
+			if event.is_action_pressed("freeze"):
+				paused = !paused
+				set_linear_velocity(Vector2(0,0))
+				set_angular_velocity(0)
+
+
+
+
+func _on_Car_input_event(viewport, event, shape_idx):
+	_on_creature_input(event)

@@ -59,7 +59,7 @@ func _ready() -> void:
 	visibility_menu.get_popup().connect("index_pressed", self, "update_vis_menu_text")
 	update_vis_menu_text(ga.curr_visibility)
 	# show all current species
-	update_species_list()
+	
 	
 
 func update_species_list() -> void:
@@ -67,6 +67,7 @@ func update_species_list() -> void:
 	Updates the list of currently alive species.
 	"""
 	# update the info text about the population.
+	
 	var info_text = default_pop_info % [ga.curr_agents.size(),
 										ga.curr_species.size(),
 										ga.best_species.species_id]
@@ -78,8 +79,11 @@ func update_species_list() -> void:
 	species_list.clear()
 	curr_species_dict.clear()
 	var species_index = 0
+	var total_alive = 0
+	
 	for species in ga.curr_species:
 		if not species.obliterate:
+			total_alive += species.alive_members.size()
 			curr_species_dict[species_index] = species
 			species_list.add_item("species_" + species.species_id)
 			species_index += 1

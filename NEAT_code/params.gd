@@ -41,17 +41,17 @@ var print_new_generation = true
 # keep this number low, but definitely not too low. 40%-50% of the num of inputs
 # is a good target to start with. It should also approach the number of inputs that
 # are assumed to be important.
-var num_initial_links = 15
+var num_initial_links = 3
 
 # maximum amount of neurons, for performance reasons. can be set arbitrarily
-var max_neuron_amt = 200
+var max_neuron_amt = 400
 
 # ----- Chaining
 # if prevent_chaining is true, only split links that connect to neurons having
 # x values of either 0 or 1. This means that networks do not exceed a depth
 # of one hidden layer until their amount of neurons exceeds this threshold.
 var prevent_chaining = true
-var chain_threshold = 14
+var chain_threshold = 11
 
 
 
@@ -168,14 +168,14 @@ var coeff_excess = 1.4
 var enough_gens_to_change_things = 4
 # how many generations should be tolerated without improvement, after that, kill
 # the species.
-var allowed_gens_no_improvement = 8
+var allowed_gens_no_improvement = 9999
 # Every mutation has two probabilities associated. This enum just refers to these
 # two states.
 enum MUTATION_RATE{normal, heightened}
 
 # ----- fitness sharing parameters
 # Params for rewarding/punishing species based on their age
-var old_age = 7
+var old_age = 8
 var youth_bonus = 1.3
 var old_penalty = 0.8
 

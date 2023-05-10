@@ -91,7 +91,7 @@ func _physics_process(delta):
 	"""
 	# make sure that sensory information gets updated every 0.2 seconds
 	time += delta
-	if time > 0.2:
+	if time > 0.05:
 		time = 0; sense()
 	# Update the forward speed
 	speed = -get_up_velocity().dot(transform.y)

@@ -17,12 +17,12 @@ var panel_parent_OG_size
 
 var scroll_container
 
-
 func _ready():
 	get_tree().get_root().set_transparent_background(true)
 #	Initialize the panel
 	panel = $CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control/Panel
 	panel_parent = $CanvasLayer/Control/FamilyTreeWindow/FamilyTreeScrollContainer/Control
+	
 	panel_parent_OG_size = panel_parent.rect_size
 	scroll_container = panel_parent.get_parent()
 
@@ -34,7 +34,7 @@ var max_zoom: float = 100.0
 
 func _input(event):
 	if event is InputEventKey:
-		if event.pressed:
+		if event.pressed and (event.is_action_pressed("zoom_in") or event.is_action_pressed("zoom_out")):
 			var prev_zoom_level = zoom_level
 
 			if event.is_action_pressed("zoom_in"):
@@ -57,20 +57,29 @@ func _input(event):
 			var scroll_before_zoom = local_mouse_position + current_scroll
 
 			# Update the zoom level
-			panel.rect_scale = Vector2(zoom_level, zoom_level)
-			panel_parent.rect_min_size = panel_parent_OG_size * zoom_level
+			panel_parent.rect_scale = Vector2(zoom_level, zoom_level)
+			panel_parent.rect_size = panel_parent.get_parent().rect_size*Vector2(zoom_level, zoom_level)
+#			panel_parent.rect_size = panel.rect_size*Vector2(zoom_level, zoom_level)
+			
+#			panel_parent.rect_min_size = panel_parent_OG_size * zoom_level
 
-			# Calculate the new scroll position
-			var scroll_after_zoom = scroll_before_zoom * (zoom_level / prev_zoom_level) - local_mouse_position
-
-			# Update the scroll_container properties
-			scroll_container.scroll_horizontal = scroll_after_zoom.x
-			scroll_container.scroll_vertical = scroll_after_zoom.y
-
-
-
-
-
+			var soize = scroll_container.get_parent().rect_size
+			print("-------")
+			print("WINDOW: ", soize)
+			scroll_container.rect_size = soize
+			print("SCROLL: ", scroll_container.rect_size)
+			print("CONTRL: ", panel_parent.rect_size)
+			print("PANEL : ", panel.rect_size)
+			print("PANEL : ", panel.rect_scale)
+			
+			
+#			# Calculate the new scroll position
+#			var scroll_after_zoom = scroll_before_zoom * (zoom_level / prev_zoom_level) - local_mouse_position
+#
+#			# Update the scroll_container properties
+#
+#			scroll_container.scroll_horizontal = scroll_after_zoom.x
+#			scroll_container.scroll_vertical = scroll_after_zoom.y
 
 
 func clear_family_tree():

@@ -51,14 +51,14 @@ func _init(neural_net: NeuralNet, is_leader_clone: bool, starting_position: Vect
 	
 #	set position to parent:
 	body.global_position = starting_position
-
-
+ 
 func process_inputs() -> void:
 	"""Gets agent sensory information, feeds it to network, and passes
 	network output to act method of the agent.
 	"""
 #	print(body)
 	var action = network.update(body.sense())
+	body.agent_message = randi()
 	body.act(action)
 
 
@@ -66,6 +66,7 @@ func on_body_death() -> void:
 	"""Marks the agent as dead, assigns the fitness, and removes it from all groups
 	"""
 	is_dead = true
+#	body.agent_message.append("KILLED!")
 	fitness = body.get_fitness()
 	# remove body from groups to make sure it receives no calls from change_visibility
 	for group in body.get_groups():

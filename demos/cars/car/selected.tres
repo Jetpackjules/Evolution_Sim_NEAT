@@ -1,0 +1,31 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform float line_width : hint_range(0.0, 60.0) = 2.0;
+uniform vec4 line_color : hint_color = vec4(1.0, 0.0, 0.0, 1.0);
+
+void fragment() {
+    vec4 sprite_color = texture(TEXTURE, UV);
+    vec4 outline_color = vec4(0.0, 0.0, 0.0, 0.0);
+
+    float dist = line_width / 2.0;
+    for (float x = -dist; x <= dist; x += 1.0) {
+        for (float y = -dist; y <= dist; y += 1.0) {
+            vec2 offset = vec2(x, y) / vec2(textureSize(TEXTURE, 0));
+            vec4 tex_color = texture(TEXTURE, UV + offset);
+            outline_color.rgb = line_color.rgb;
+            outline_color.a = max(outline_color.a, tex_color.a);
+        }
+    }
+
+    COLOR = mix(outline_color, sprite_color, sprite_color.a);
+}
+"
+
+[resource]
+render_priority = 3
+shader = SubResource( 1 )
+shader_param/line_width = 60.0
+shader_param/line_color = Color( 1, 0.976471, 0.976471, 1 )

@@ -22,6 +22,8 @@ var representative: Genome
 # Leader is the fittest member. If Params.compare_to_leader, he is also the representative
 var leader: Genome
 
+var predator: bool = false
+
 # all members of the current generation
 var alive_members = []
 # expresses the number of members this species had in the previous generation
@@ -65,10 +67,10 @@ func _init(input_id: String, parent_id_input: String = "", generation_input: int
 	parent_id = parent_id_input
 	generation = generation_input
 
-	var difference = 0.25
-	color = Color(clamp(original_color.r + rand_range(-difference/2, difference), 0, 1),
-		 clamp(original_color.g + rand_range(-difference/2, difference), 0, 1),
-		 clamp(original_color.b + rand_range(-difference/2, difference), 0, 1), 1.0)
+	var difference = 0.2
+	color = Color(fmod(original_color.r + rand_range(-difference/1.3, difference) + 0.1, 1.0),
+				  fmod(original_color.g + rand_range(-difference/1.3, difference) + 0.1, 1.0),
+				  fmod(original_color.b + rand_range(-difference/1.3, difference) + 0.1, 1.0), 1.0)
 
 
 
@@ -95,10 +97,11 @@ func update() -> void:
 	#removing ded-uns?
 	var new_alive = []
 	for member in alive_members:
-#		member.agent.enable_highlight(true)
+		if member.agent.body.is_in_group("predator"):
+			predator = true
+#			break
+			
 		if member.agent.is_dead == true:
-#			print("ASFFSAASFDFDG")
-#			member.agent.body.queue_free()
 			pass
 		else:
 			new_alive.append(member)
@@ -149,6 +152,19 @@ func update() -> void:
 
 
 			
+func to_dict() -> Dictionary:
+	return {
+		"generation": generation,
+		"parent_id": parent_id,
+		"angle": angle,
+		"species_id": species_id,
+		"age": age,
+		"color": color,
+		"obliterate": obliterate,
+		"best_ever_fitness": best_ever_fitness,
+		"predator": predator
+	}
+
 
 
 func get_avg_fitness() -> float:
