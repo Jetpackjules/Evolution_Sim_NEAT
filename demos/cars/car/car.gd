@@ -107,7 +107,7 @@ func update_info_screen():
 		actions_str += "%s: %s\n" % [actions_labels[i], str(actions_list[i])]
 #	var agent = get_parent().get_parent().get_parent().print_tree_pretty()
 	
-	$InfoScreen/Panel/Label.text = "Groups: %s\nEnergy: %s\nLife Score: %s\nFood Score: %s\nAge: %s\n Agent: %s\n, Agnt Msg: %s\n, Angular Velocity: %s\nLinear Velocity: %s\nActions:\n%s" % [str(get_groups()), str(stepify(energy, 0.1)), str(life_score), str(food_score), str(age), str(act_times), str(agent_message), str(_angular_velocity), str(_velocity), actions_str]
+	$InfoScreen/Panel/Label.text = "Groups: %s\nEnergy: %s\nConsumption: %s\nLife Score: %s\nFood Score: %s\nAge: %s\n Agent: %s\n, Agnt Msg: %s\n, Angular Velocity: %s\nLinear Velocity: %s\nActions:\n%s" % [str(get_groups()), str(stepify(energy, 0.1)), str(energy_consumption_multiplier), str(life_score), str(food_score), str(age), str(act_times), str(agent_message), str(_angular_velocity), str(_velocity), actions_str]
 
 
 
@@ -237,7 +237,7 @@ func act(actions: Array) -> void:
 			
 		flash_red_sprite()
 		add_to_group("predator")
-		energy -= 0.45
+		energy -= 0.5
 
 	# Prevent exceeding max velocity
 	var max_speed = (Vector2(0, -1) * max_forward_velocity).rotated(rotation)
@@ -311,13 +311,15 @@ func crash(body) -> void:
 	it's own collider.
 	"""
 	if body == self:
-		food_score = food_score*0.5
+#		food_score = food_score*0.5
 		die()
 
 
 func starve() -> void:
 	if energy < 0:
 		die()
+		food_score *= 0.7
+		
 
 
 func _on_Explosion_animation_finished() -> void:

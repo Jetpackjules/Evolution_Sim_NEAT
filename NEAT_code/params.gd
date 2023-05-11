@@ -10,6 +10,9 @@ Methods for storing and loading configurations are also included.
 # numbers of inputs and outputs that every neural net will have
 var num_inputs: int
 var num_outputs: int
+
+var update_step: bool = true
+
 # A path to the agent_body - the scene that represents the player, providing the
 # sense(), act() and get_fitness() functions. This parameter is set by the user
 # when a new GeneticAlgorithm node gets instanced.

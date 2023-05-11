@@ -98,7 +98,7 @@ func _physics_process(delta) -> void:
 			ga.next_timestep()
 			time = 0
 		# check if enough time has passed to start a new generation
-		if total_time > generation_step or ga.all_agents_dead:
+		if (total_time > generation_step) and (Params.update_step == true):
 
 			for creature in ga.alive:
 				creature.body.age += 1
@@ -196,6 +196,9 @@ func _input(event):
 				$Track/FamilyTree.cycle(ga.all_species)
 			if event.is_action_pressed("freeze"):
 				paused = !paused
+			if event.is_action_pressed("pause_evolution"):
+				Params.update_step = !Params.update_step
+				
 
 
 func _draw():

@@ -423,7 +423,7 @@ func finish_current_agents() -> void:
 			agent.fitness = agent.body.get_fitness()
 #			agent.body.food_score = 0
 #			agent.fitness
-#			agent.body.energy_consumption_multiplier += 0.5
+			agent.body.energy_consumption_multiplier += 0.3
 			
 			alive.append(agent)
 			genome.fitness = agent.fitness

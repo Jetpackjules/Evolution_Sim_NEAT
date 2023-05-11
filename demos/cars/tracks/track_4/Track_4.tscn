@@ -249,7 +249,7 @@ shape = SubResource( 10 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="RestrictedArea/Hunter"]
 frames = SubResource( 12 )
 animation = "ATTACK"
-frame = 5
+frame = 2
 playing = true
 
 [node name="DetectionArea" type="Area2D" parent="RestrictedArea/Hunter"]
@@ -276,7 +276,7 @@ shape = SubResource( 10 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="RestrictedArea/Hunter2"]
 frames = SubResource( 12 )
 animation = "ATTACK"
-frame = 4
+frame = 1
 playing = true
 
 [node name="DetectionArea" type="Area2D" parent="RestrictedArea/Hunter2"]
@@ -303,7 +303,7 @@ shape = SubResource( 10 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="RestrictedArea/Hunter3"]
 frames = SubResource( 12 )
 animation = "ATTACK"
-frame = 4
+frame = 1
 playing = true
 
 [node name="DetectionArea" type="Area2D" parent="RestrictedArea/Hunter3"]
