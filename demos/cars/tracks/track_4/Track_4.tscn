@@ -101,8 +101,6 @@ texture = ExtResource( 2 )
 
 [node name="PlayerStart" type="Position2D" parent="."]
 
-[node name="Center" type="Position2D" parent="."]
-
 [node name="Bounds" type="Area2D" parent="." groups=["bounds", "danger"]]
 scale = Vector2( 2, 2 )
 
@@ -249,7 +247,7 @@ shape = SubResource( 10 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="RestrictedArea/Hunter"]
 frames = SubResource( 12 )
 animation = "ATTACK"
-frame = 2
+frame = 6
 playing = true
 
 [node name="DetectionArea" type="Area2D" parent="RestrictedArea/Hunter"]
@@ -276,7 +274,7 @@ shape = SubResource( 10 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="RestrictedArea/Hunter2"]
 frames = SubResource( 12 )
 animation = "ATTACK"
-frame = 1
+frame = 5
 playing = true
 
 [node name="DetectionArea" type="Area2D" parent="RestrictedArea/Hunter2"]
@@ -303,7 +301,7 @@ shape = SubResource( 10 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="RestrictedArea/Hunter3"]
 frames = SubResource( 12 )
 animation = "ATTACK"
-frame = 1
+frame = 5
 playing = true
 
 [node name="DetectionArea" type="Area2D" parent="RestrictedArea/Hunter3"]
@@ -392,6 +390,8 @@ size_flags_vertical = 3
 color = Color( 1, 0, 0, 1 )
 
 [node name="Start" type="Position2D" parent="."]
+
+[node name="Center" type="Position2D" parent="."]
 
 [connection signal="body_exited" from="RestrictedArea/Area" to="RestrictedArea/Hunter" method="_on_Area_body_exited"]
 [connection signal="body_exited" from="RestrictedArea/Area" to="RestrictedArea/Hunter2" method="_on_Area_body_exited"]

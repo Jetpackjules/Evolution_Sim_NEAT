@@ -15,7 +15,7 @@ var actions_list = []
 var energy_consumption_multiplier = 1
 var acceleration = 15
 var max_forward_velocity = 1500
-var steering_torque = 5 # Affects turning speed
+var steering_torque = 8 # Affects turning speed
 
 var outline = false
 
@@ -43,7 +43,7 @@ var dead = false
 var eat_radius = 50
 
 
-#onready var center = get_node("../../Center")
+onready var center = get_node("../../Center")
 #onready var start = get_node("../../Start")
 onready var flash_timer = get_node("Timer")
 # signal that let's the controlling agent know it just died
@@ -51,7 +51,7 @@ signal death
 
 var age = 0
 
-
+onready var brick = load("res://demos/cars/car/Brick/Brick.tscn")
 var paused = false
 
 func _ready() -> void:
@@ -60,7 +60,6 @@ func _ready() -> void:
 	"""
 #	connect("input_event", self, "_on_creature_input")
 
-	
 	
 	get_child(5).highlighter_radius = eat_radius
 	# connect a signal from track bounds, to detect when a crash occurs
@@ -101,7 +100,7 @@ func _on_creature_input(event):
 
 var agent_message = []
 func update_info_screen():
-	var actions_labels = ["Speed", "Turn", "Attack"]
+	var actions_labels = ["Speed", "Turn", "Attack", "Brick"]
 	var actions_str = ""
 	for i in range(len(actions_list)):
 		actions_str += "%s: %s\n" % [actions_labels[i], str(actions_list[i])]
@@ -179,16 +178,19 @@ func sense() -> Array:
 			var collided_object = caster.get_collider()
 			if collided_object.is_in_group("food"):
 				senses.append(1)  # 1 represents food
-			elif collided_object.is_in_group("danger"):
-				senses.append(-1)  # -1 represents danger
 			elif collided_object.is_in_group("booger") and collided_object != self:
 				if (collided_object.age == 0) and (age != 0):
 					senses.append(2) # to for child boogers that don't yield energy...
-#				elif collided_object.is_in_group("predator"):
-##					print("SEEN PREDATOR!")
-#					senses.append(-2)  # -2 represents predator boogers
+				elif collided_object.is_in_group("predator"):
+					senses.append(-2)  # -2 represents predator boogers
 				else:
 					senses.append(3)  # 2 represents other boogers (potential prey)
+			elif collided_object.is_in_group("danger"):
+				senses.append(-1)  # -1 represents danger
+			
+			elif collided_object.is_in_group("brick"):
+				senses.append(4)  # -1 represents danger
+			
 			else:
 				senses.append(0)  # 0 for other objects
 		else:
@@ -207,30 +209,15 @@ func act(actions: Array) -> void:
 	act_times += 1
 	actions_list = actions
 	var torque = steering_torque
-	# accelerate
-#	if actions[0] > 0.0:
+
 	_velocity = -transform.y * acceleration * 15 * actions[0]
-#	# break & reverse
-#	elif actions[1] > 0.0:
-#		_velocity = transform.y * acceleration * 15
-#	else:
-#		_velocity = Vector2(0, 0)
 
 	# steer right
 	_angular_velocity = actions[1] * torque
 
-#	if actions[2] > 0.0:
-#		_angular_velocity = actions[2] * torque
-#	# steer left
-#	elif actions[3] > 0.0:
-##		_angular_velocity = range_lerp(actions[3], 0.2, 1, 0, 1) * -torque
-#		_angular_velocity = actions[3] * -torque
-#	else:
-#		_angular_velocity = 0
 
 	# eat other boogers
 	if actions[2] > 0.5:
-
 		var prey = get_preys_in_range(eat_radius)  #Eat nearest prey in the radius
 		if prey:
 			eat(prey)
@@ -238,6 +225,10 @@ func act(actions: Array) -> void:
 		flash_red_sprite()
 		add_to_group("predator")
 		energy -= 0.5
+		
+	if actions[3] > 0.5:
+		energy -= 0.4
+		lay_brick()
 
 	# Prevent exceeding max velocity
 	var max_speed = (Vector2(0, -1) * max_forward_velocity).rotated(rotation)
@@ -270,6 +261,15 @@ func eat(prey):
 	# Make the sprite flash red
 
 	
+func get_behind_position() -> Vector2:
+	# Get the forward direction of the creature
+	var forward_direction = -transform.y
+
+	# Get the position exactly 12 pixels behind the creature
+	var behind_position = global_position - forward_direction * 12
+
+	return behind_position
+
 
 func flash_red_sprite() -> void:
 #	get_node("Sprite").self_modulate = Color(1, 0, 0)  # Change the sprite color to red
@@ -337,7 +337,13 @@ func _input(event):
 				set_linear_velocity(Vector2(0,0))
 				set_angular_velocity(0)
 
-
+func lay_brick():
+	var brick_instance = brick.instance()
+	brick_instance.position = get_behind_position()
+	center.add_child(brick_instance)
+	
+	
+	
 
 
 func _on_Car_input_event(viewport, event, shape_idx):

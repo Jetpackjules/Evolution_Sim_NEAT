@@ -123,7 +123,7 @@ func create_initial_population() -> Array:
 	var all_neurons = Utils.merge_dicts(input_neurons, output_neurons)
 	# --- generate the first generation of genomes
 	
-	var spawn_points = call_get_safe_spawn_points(Params.population_size, 3000)
+	var spawn_points = call_get_safe_spawn_points(Params.population_size+1, 3000)
 	spawns = spawn_points.duplicate()
 	
 	var initial_genomes = []
