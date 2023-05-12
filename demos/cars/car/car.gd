@@ -41,7 +41,7 @@ var energy = 0.0
 var dead = false
 
 var eat_radius = 50
-
+var tick = 0
 
 onready var center = get_node("../../Center")
 #onready var start = get_node("../../Start")
@@ -53,6 +53,8 @@ var age = 0
 
 onready var brick = load("res://demos/cars/car/Brick/Brick.tscn")
 var paused = false
+
+var speed_penalty = false
 
 func _ready() -> void:
 	"""Connect the car to the bounds of the track, receive a signal when (any) car
@@ -138,7 +140,13 @@ func _physics_process(_delta) -> void:
 		starve()
 		life_score += _delta
 		
-		
+		if speed_penalty:
+			tick += _delta
+			if tick > 1:
+				speed_penalty = false
+				max_forward_velocity *= 2
+				tick = 0
+			
 		if age >= 1:
 			var sprite = get_node("Sprite")
 
@@ -179,10 +187,10 @@ func sense() -> Array:
 			if collided_object.is_in_group("food"):
 				senses.append(1)  # 1 represents food
 			elif collided_object.is_in_group("booger") and collided_object != self:
-				if (collided_object.age == 0) and (age != 0):
-					senses.append(2) # to for child boogers that don't yield energy...
-				elif collided_object.is_in_group("predator"):
+				if collided_object.is_in_group("predator"):
 					senses.append(-2)  # -2 represents predator boogers
+				elif (collided_object.age == 0) and (age != 0):
+					senses.append(2) # to for child boogers that don't yield energy...
 				else:
 					senses.append(3)  # 2 represents other boogers (potential prey)
 			elif collided_object.is_in_group("danger"):
@@ -226,9 +234,9 @@ func act(actions: Array) -> void:
 		add_to_group("predator")
 		energy -= 0.5
 		
-	if actions[3] > 0.5:
-		energy -= 0.4
-		lay_brick()
+#	if actions[3] > 0.5:
+#		energy -= 0.4
+#		lay_brick()
 
 	# Prevent exceeding max velocity
 	var max_speed = (Vector2(0, -1) * max_forward_velocity).rotated(rotation)
@@ -256,6 +264,8 @@ func eat(prey):
 	if !prey.dead:
 		if (age == 0) or (prey.age != 0):
 			energy += 3  # Predator gains 3 energy, unless child, in which case nothing...
+		max_forward_velocity *= 0.5
+		speed_penalty = true
 		prey.die()
 
 	# Make the sprite flash red

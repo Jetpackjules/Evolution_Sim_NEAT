@@ -60,7 +60,7 @@ func load_track(track_num: int) -> void:
 	# connect a signal to increase the generation_step once the first car reaches HalfLap
 	# IMPORTANT add the ga node as a child
 	#old config: car_params
-	ga = GeneticAlgorithm.new(34, 4, agent_body_path, true, "Custom_Evolution_Config")
+	ga = GeneticAlgorithm.new(34, 3, agent_body_path, true, "Custom_Evolution_Config")
 
 	add_child(ga)
 
