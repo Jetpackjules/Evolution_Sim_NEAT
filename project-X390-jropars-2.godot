@@ -173,26 +173,6 @@ pause_evolution={
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":80,"unicode":0,"echo":false,"script":null)
  ]
 }
-tunnel1={
-"deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":49,"unicode":0,"echo":false,"script":null)
- ]
-}
-tunnel2={
-"deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":50,"unicode":0,"echo":false,"script":null)
- ]
-}
-tunnel3={
-"deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":51,"unicode":0,"echo":false,"script":null)
- ]
-}
-tunnel4={
-"deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":52,"unicode":0,"echo":false,"script":null)
- ]
-}
 
 [physics]
 
@@ -201,6 +181,5 @@ tunnel4={
 
 [rendering]
 
-environment/default_clear_color=Color( 1, 1, 1, 1 )
+environment/default_clear_color=Color( 0, 0, 0, 1 )
 environment/default_environment="res://default_env.tres"
-environment/bg_color=Color( 0.14, 0.14, 0.14, 1 )

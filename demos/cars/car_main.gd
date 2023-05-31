@@ -37,7 +37,7 @@ var curr_track_num: int
 #var fitness_threshold = TAU + 1
 var first_ever = true
 #Changed for food foraging so it never ends:
-var fitness_threshold = 250
+var fitness_threshold = 2500
 var num = 0
 
 # a splash screen on how to continue after reaching fitness threshold
@@ -60,7 +60,7 @@ func load_track(track_num: int) -> void:
 	# connect a signal to increase the generation_step once the first car reaches HalfLap
 	# IMPORTANT add the ga node as a child
 	#old config: car_params
-	ga = GeneticAlgorithm.new(34, 3, agent_body_path, true, "Custom_Evolution_Config")
+	ga = GeneticAlgorithm.new(36, 5, agent_body_path, true, "Custom_Evolution_Config")
 
 	add_child(ga)
 
@@ -186,8 +186,6 @@ func continue_ga(new_threshold) -> void:
 	paused = false
 
 
-func get_everyone() -> Array:
-	return ga.all_genomes
 
 func _input(event):
 	if event is InputEventKey:

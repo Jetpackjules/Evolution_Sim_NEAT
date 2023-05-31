@@ -23,7 +23,7 @@ var curr_best: Genome
 # the species with the best average fitness from the last generation
 var best_species: Species
 #ALL genomes EVER MADE!!!!
-var all_genomes = []
+#var all_genomes = []
 # the array of all currently alive genomes
 var curr_genomes = []
 # array holding all agents, gets updated to only hold alive agents every timestep
@@ -200,15 +200,16 @@ func get_agent_by_genome_id(genome_id: int) -> Agent:
 				return agent
 			else:
 				print("Bodiless parent... :(")
-	for genome in all_genomes:
-		if genome.id == genome_id:
-			if genome.agent.body:
-				return genome.agent
-			else:
-				print("Bodiless parent... :(")
+#
+#	for genome in all_genomes:
+#		if genome.id == genome_id:
+#			if genome.agent.body:
+#				return genome.agent
+#			else:
+#				print("Bodiless parent... :(")
 				
 #	print("Failed to find: ", genome_id)
-
+	breakpoint
 	return null
 
 func spawn_first_wave():
@@ -308,16 +309,17 @@ func next_generation() -> void:
 #		print("NOT ENOUGH!")
 		new_genomes += make_hybrids(Params.population_size - (num_spawned+alive_rn))
 		
-		
-	#	Save to all_genomes and removed duplicates:
-	if all_genomes.empty():  # Check if all_genomes is empty
-		all_genomes = curr_genomes
-	else:
-		all_genomes += curr_genomes
-#		print("MORE THANT 300!")
-#		maybe comment this out?
-		all_genomes = Utils.sort_and_remove_duplicates(all_genomes)
-#		print("TOTAL GENOMES: ", str(len(all_genomes)))
+#
+#	#	Save to all_genomes and removed duplicates:
+#	if all_genomes.empty():  # Check if all_genomes is empty
+#		all_genomes = curr_genomes
+#	else:
+#		all_genomes += curr_genomes
+##		print("MORE THANT 300!")
+##		maybe comment this out?
+#		all_genomes = Utils.sort_and_remove_duplicates(all_genomes)
+##		print("TOTAL GENOMES: ", str(len(all_genomes)))
+
 	
 	# Carrying over old genomes that survived:
 	for genome in curr_genomes:
@@ -432,13 +434,16 @@ func finish_current_agents() -> void:
 #			agent.body.emit_signal("death")
 			deads += 1
 			genome.fitness = agent.fitness
+			agent.fitness = agent.body.get_fitness()
 			agent.body.queue_free()
 #	print("DEADS: ", deads)
 			
 #			
 
 	# clear the agents array
-#	curr_agents.clear()
+#	curr_agents.clear() # THIS IS A CHEANGE!!!!
+	
+	
 	curr_agents = alive
 
 var first = true
@@ -452,25 +457,7 @@ func update_curr_species() -> Array:
 	num_dead_species = 0
 	
 	if !first:
-#		for species in curr_species:
-#			if not species.obliterate and not (species in all_species):
-#				all_species.append(species)
-
-		for species in curr_species:
-			var species_ids = []
-			for s in all_species:
-				species_ids.append(s["species_id"])
-
-			if species.species_id in species_ids:
-				var index = species_ids.find(species.species_id)
-				var current_species = all_species[index]
-				if species.obliterate != current_species["obliterate"] or species.predator != current_species["predator"]:
-					all_species[index] = species.to_dict()
-			else:
-				if not species.obliterate:
-					all_species.append(species.to_dict())
-
-
+		pass
 
 
 	first = false
@@ -488,6 +475,26 @@ func update_curr_species() -> Array:
 		# into the next generation, update the species leader, calculate the average fitness
 		# and calculate how many spawns the species gets to have in the next generation
 		species.update()
+		
+#			-------------------------------
+		var species_ids = []
+		for s in all_species:
+			species_ids.append(s["species_id"])
+
+#		if species.obliterate:
+#			breakpoint
+		
+		if species.species_id in species_ids:
+			var index = species_ids.find(species.species_id)
+			var current_species = all_species[index]
+			
+			if (species.obliterate != current_species["obliterate"]) or (species.predator != current_species["predator"]):
+				all_species[index] = species.to_dict()
+		else:
+#				if not species.obliterate:
+			all_species.append(species.to_dict())
+				
+
 		# check if the species gets to survive
 #		print("CHECKING FOR OBLITERATE:")
 		if not species.obliterate:

@@ -5,6 +5,7 @@ extends Node2D
 object (the agent body).
 """
 var highlighter_radius = Params.highlighter_radius
+var color = Params.highlighter_color
 
 func _ready() -> void:
 	# set the name
@@ -22,5 +23,5 @@ func _draw():
 			 0,
 			 TAU,
 			 highlighter_radius / 2,
-			 Params.highlighter_color,
+			 color,
 			 Params.highlighter_width)

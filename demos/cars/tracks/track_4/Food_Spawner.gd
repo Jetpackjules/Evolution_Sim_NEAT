@@ -2,19 +2,19 @@ extends Node2D
 
 var Food = load("res://demos/cars/tracks/track_4/Food.tscn")
 
-export (int) var spawn_range = 250
+export (int) var spawn_range = 150
 export (int) var max_attempts = 100
 
 export (float) var time_interval = 10.0
 export (float) var bush_spawn = 0.0
-export (float) var area_spawn = 22.0
+export (float) var area_spawn = 25.0
 
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	rng.seed = 42
+#	rng.seed = 42
 #	bush_grow(20, spawn_range)
-	renew(200, 3000)
+	renew(150, 3000)
 
 var time_passed = 0
 func _physics_process(delta) -> void:

@@ -4,19 +4,19 @@ onready var timer = $Timer
 onready var animation_player = $AnimationPlayer
 
 func _ready() -> void:
-	connect("body_entered", self, "touched")
+#	connect("body_entered", self, "touched")
 	animation_player.play("ColorChange")
 
-func touched(body) -> void:
+func chow(body) -> void:
 	if body.is_in_group("booger"):
-		body.food_score += 0.5
-		body.energy += 1
-		
-#		var sprite = body.get_node("Sprite")
-#		var new_size = max(body.energy*(0.058125/5), 0.093)
-#		if sprite:
-#			sprite.scale = Vector2(new_size, new_size)
-			
+#		if !body.is_in_group("predator"):
+		body.food_score += 1
+		body.energy += ((1)/2) + ((2)/2)*abs(clamp(body.purity, 0, 1))
+
+
+#		else:
+#			body.food_score += 0.25
+#			body.energy += 0.25
 		queue_free()
 
 

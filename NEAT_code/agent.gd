@@ -25,9 +25,9 @@ var body = load(Params.agent_body_path).instance()
 var network: NeuralNet
 
 # the fitness only gets assigned when the body dies by calling body.get_fitness()
-var fitness = 0
+var fitness := 0.0
 # once set to true the agent can be removed from curr_agents in ga.next_timestep()
-var is_dead = false
+var is_dead := false
 # the highlighter shows the current location of the body in the world
 var highlighter
 
